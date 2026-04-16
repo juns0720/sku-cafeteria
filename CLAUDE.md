@@ -129,3 +129,8 @@ JWT 시크릿은 환경변수 `JWT_SECRET`으로 주입한다 (기본값: dev용
 - [ ] STEP4: 학식 크롤러
 - [ ] STEP5: 메뉴 조회 API
 - [ ] STEP6: 리뷰 CRUD API
+
+## Known Issues / TODO
+- [ ] RefreshToken 관리 미구현 (현재 발급만 하고 저장 안 함)
+  → 백엔드 완료 후 Redis로 구현 예정
+  → Upstash Redis 무료 플랜 사용 예정 (10,000 req/일)

@@ -19,6 +19,9 @@ app:
     access-expiration: 3600000    # 1시간 (ms)
     refresh-expiration: 604800000 # 7일 (ms)
 
+scheduling:
+  enabled: true
+
 logging:
   level:
     root: DEBUG

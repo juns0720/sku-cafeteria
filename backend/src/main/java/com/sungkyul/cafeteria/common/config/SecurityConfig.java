@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/menus/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
+                        .requestMatchers("/api/v1/admin/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
