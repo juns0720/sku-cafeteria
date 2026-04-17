@@ -63,8 +63,11 @@ com.sungkyul.cafeteria
 │   ├── entity/User.java
 │   └── repository/UserRepository.java
 ├── menu/
+│   ├── controller/MenuController.java    # GET /api/v1/menus/today, /weekly, /{menuId}
+│   ├── dto/MenuResponse.java, TodayMenuResponse.java, WeeklyMenuResponse.java
 │   ├── entity/Menu.java
-│   └── repository/MenuRepository.java
+│   ├── repository/MenuRepository.java
+│   └── service/MenuService.java
 └── review/
     ├── entity/Review.java
     └── repository/ReviewRepository.java
@@ -112,6 +115,14 @@ CORS 허용 오리진은 `SecurityConfig.corsConfigurationSource()`에서 관리
 - **SSL 이슈**: 성결대 사이트는 KISA(한국 CA) 인증서를 사용해 JVM 기본 truststore에 없음 → `fetchDocument()`에서 trust-all `SSLContext`로 우회
 - **테스트 설계**: `fetchDocument()`가 package-private이라 같은 패키지의 테스트에서 Mockito `spy`로 stubbing 가능 (`MenuCrawlerServiceTest`)
 
+### Menu API
+
+- `GET /api/v1/menus/today` → 오늘 날짜 기준 학식 목록
+- `GET /api/v1/menus/weekly?date=yyyy-MM-dd` → 해당 주 월~금 식단 (`date` 생략 시 이번 주)
+  - 응답 `days` 필드: `"MON"~"FRI"` 키, 데이터 없는 요일은 빈 리스트
+- `GET /api/v1/menus/{menuId}` → 메뉴 단건 상세 (없으면 404)
+- 각 `MenuResponse`에 `averageRating`(null 가능), `reviewCount` 포함
+
 ### Domain Rules
 
 - **리뷰**: 1인 1메뉴 1리뷰 (`uk_review_user_menu` UNIQUE 제약 — `user_id + menu_id`)
@@ -136,7 +147,7 @@ JWT 시크릿은 환경변수 `JWT_SECRET`으로 주입한다 (기본값: dev용
 - [x] STEP2: DB 스키마 및 Entity (User, Menu, Review + Repository)
 - [x] STEP3: Google OAuth2 + JWT 로그인
 - [x] STEP4: 학식 크롤러 (MenuCrawlerService, CrawlerScheduler, AdminController) + 단위 테스트
-- [ ] STEP5: 메뉴 조회 API
+- [x] STEP5: 메뉴 조회 API (MenuService, MenuController, menu/dto)
 - [ ] STEP6: 리뷰 CRUD API
 
 ## Known Issues / TODO
@@ -144,3 +155,5 @@ JWT 시크릿은 환경변수 `JWT_SECRET`으로 주입한다 (기본값: dev용
   → 백엔드 완료 후 Redis로 구현 예정
   → Upstash Redis 무료 플랜 사용 예정 (10,000 req/일)
 - [ ] AdminController 인가: 현재 일반 JWT로 접근 가능 → 추후 ROLE_ADMIN 분리 필요
+- [ ] Menu API N+1 쿼리: `MenuService`에서 메뉴당 `averageRating`·`reviewCount`를 개별 쿼리로 조회
+  → STEP6 완료 후 LEFT JOIN JPQL 단일 쿼리로 개선 예정
