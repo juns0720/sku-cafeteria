@@ -4,17 +4,18 @@
 
 - [x] FE-1-1: Vite 프로젝트 생성 + TailwindCSS 설정
 - [x] FE-1-2: Axios 인스턴스 (api/client.js)
+- [x] FE-1-3: React Query + React Router 설정
 
 ## 다음 작업
 
-- [ ] FE-1-3: React Query + React Router 설정
+- [ ] FE-1-4: Header 컴포넌트
 
 ## 전체 단계 목록
 
 [인프라]
 - [x] FE-1-1: Vite 프로젝트 생성 + TailwindCSS 설정
 - [x] FE-1-2: Axios 인스턴스 (api/client.js)
-- [ ] FE-1-3: React Query + React Router 설정
+- [x] FE-1-3: React Query + React Router 설정
 - [ ] FE-1-4: Header 컴포넌트
 - [ ] FE-1-5: BottomNav 컴포넌트
 
