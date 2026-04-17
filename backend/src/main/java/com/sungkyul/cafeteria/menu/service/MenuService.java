@@ -2,14 +2,19 @@ package com.sungkyul.cafeteria.menu.service;
 
 import com.sungkyul.cafeteria.menu.dto.MenuResponse;
 import com.sungkyul.cafeteria.menu.dto.TodayMenuResponse;
+import com.sungkyul.cafeteria.menu.dto.WeeklyMenuResponse;
 import com.sungkyul.cafeteria.menu.entity.Menu;
 import com.sungkyul.cafeteria.menu.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -34,5 +39,43 @@ public class MenuService {
                 .toList();
 
         return new TodayMenuResponse(today, responses);
+    }
+
+    @Transactional(readOnly = true)
+    public WeeklyMenuResponse getWeeklyMenus(LocalDate date) {
+        LocalDate base = (date != null) ? date : LocalDate.now();
+        LocalDate monday = base.with(DayOfWeek.MONDAY);
+        LocalDate friday = monday.plusDays(4);
+
+        List<Menu> menus = menuRepository.findByServedDateBetween(monday, friday);
+
+        Map<String, List<MenuResponse>> days = new LinkedHashMap<>();
+        String[] keys = {"MON", "TUE", "WED", "THU", "FRI"};
+        for (String key : keys) {
+            days.put(key, new ArrayList<>());
+        }
+
+        for (Menu menu : menus) {
+            String key = switch (menu.getServedDate().getDayOfWeek()) {
+                case MONDAY    -> "MON";
+                case TUESDAY   -> "TUE";
+                case WEDNESDAY -> "WED";
+                case THURSDAY  -> "THU";
+                case FRIDAY    -> "FRI";
+                default        -> null;
+            };
+            if (key == null) continue;
+
+            days.get(key).add(new MenuResponse(
+                    menu.getId(),
+                    menu.getName(),
+                    menu.getCorner(),
+                    menu.getServedDate(),
+                    menuRepository.findAverageRatingByMenuId(menu.getId()),
+                    menuRepository.countReviewsByMenuId(menu.getId())
+            ));
+        }
+
+        return new WeeklyMenuResponse(monday, friday, days);
     }
 }
