@@ -32,6 +32,11 @@ public class User {
     @Column
     private String profileImage;
 
+    /** 사용자가 직접 닉네임을 설정했는지 여부 */
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isNicknameSet = false;
+
     /** 계정 생성 시각 (DB 삽입 시 자동 설정) */
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -39,7 +44,15 @@ public class User {
 
     /** Google 프로필 정보 갱신 (로그인 시 호출) */
     public void updateProfile(String nickname, String profileImage) {
-        this.nickname = nickname;
         this.profileImage = profileImage;
+        if (!this.isNicknameSet) {
+            this.nickname = nickname;
+        }
+    }
+
+    /** 사용자가 직접 닉네임 변경 */
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+        this.isNicknameSet = true;
     }
 }

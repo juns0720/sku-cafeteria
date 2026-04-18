@@ -5,5 +5,6 @@ public record UserResponse(
         String googleId,
         String email,
         String nickname,
-        String profileImage
+        String profileImage,
+        boolean isNicknameSet
 ) {}

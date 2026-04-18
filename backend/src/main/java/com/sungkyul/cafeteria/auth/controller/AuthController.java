@@ -2,6 +2,7 @@ package com.sungkyul.cafeteria.auth.controller;
 
 import com.sungkyul.cafeteria.auth.dto.LoginRequest;
 import com.sungkyul.cafeteria.auth.dto.LoginResponse;
+import com.sungkyul.cafeteria.auth.dto.NicknameRequest;
 import com.sungkyul.cafeteria.auth.dto.UserResponse;
 import com.sungkyul.cafeteria.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -28,5 +29,15 @@ public class AuthController {
     public ResponseEntity<UserResponse> me(Authentication authentication) {
         Long userId = (Long) authentication.getPrincipal();
         return ResponseEntity.ok(authService.getMe(userId));
+    }
+
+    /** 커스텀 닉네임 설정 */
+    @PatchMapping("/me/nickname")
+    public ResponseEntity<Void> updateNickname(
+            @Valid @RequestBody NicknameRequest request,
+            Authentication authentication) {
+        Long userId = (Long) authentication.getPrincipal();
+        authService.updateNickname(userId, request.nickname());
+        return ResponseEntity.ok().build();
     }
 }

@@ -6,5 +6,6 @@ public record LoginResponse(
         Long userId,
         String nickname,
         String email,
-        String profileImage
+        String profileImage,
+        boolean isNicknameSet
 ) {}

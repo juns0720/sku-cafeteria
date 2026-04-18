@@ -68,8 +68,19 @@ public class AuthService {
         return new LoginResponse(
                 accessToken, refreshToken,
                 user.getId(), user.getNickname(),
-                user.getEmail(), user.getProfileImage()
+                user.getEmail(), user.getProfileImage(),
+                user.isNicknameSet()
         );
+    }
+
+    @Transactional
+    public void updateNickname(Long userId, String nickname) {
+        if (userRepository.existsByNicknameAndIdNot(nickname, userId)) {
+            throw new IllegalStateException("이미 사용 중인 닉네임입니다");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다"));
+        user.changeNickname(nickname);
     }
 
     @Transactional(readOnly = true)
@@ -78,7 +89,8 @@ public class AuthService {
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다"));
         return new UserResponse(
                 user.getId(), user.getGoogleId(),
-                user.getEmail(), user.getNickname(), user.getProfileImage()
+                user.getEmail(), user.getNickname(), user.getProfileImage(),
+                user.isNicknameSet()
         );
     }
 }

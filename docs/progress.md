@@ -18,10 +18,10 @@
 - [x] **BE-A-1**: Flyway 도입 + V1 baseline
 - [x] **BE-A-0**: `menus` 2-테이블 정규화 (`menus(name,corner)` + `menu_dates`) + V2 migration
 
-**customNickname**
-- [ ] **BE-A-2a**: `customNickname` 컬럼 (nullable) + V3 migration
-- [ ] **BE-A-2b**: `PATCH /auth/me/nickname` + 중복 시 409
-- [ ] **BE-A-2c**: `GET /auth/me` `displayName` 필드 (`customNickname ?? nickname`)
+**닉네임 단일화** (설계 변경: customNickname → nickname 단일 필드)
+- [x] **BE-A-2a**: `is_nickname_set` 컬럼 + V3(custom_nickname) + V4(unify_nickname) migration
+- [x] **BE-A-2b**: `PATCH /auth/me/nickname` → `nickname` 직접 업데이트 + 중복 시 409
+- [x] **BE-A-2c**: `GET /auth/me` + `LoginResponse` `isNicknameSet` 필드, 리뷰에 설정된 닉네임 반영
 
 **Review 3축 별점**
 - [ ] **BE-A-3a**: `tasteRating/amountRating/valueRating` 컬럼 (nullable) + V4 migration
