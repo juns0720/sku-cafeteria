@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     /** Google OAuth2 ID 중복 여부 확인 */
     boolean existsByGoogleId(String googleId);
+
+    boolean existsByCustomNickname(String customNickname);
 }

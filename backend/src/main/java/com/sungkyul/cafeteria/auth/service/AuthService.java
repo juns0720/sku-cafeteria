@@ -72,6 +72,16 @@ public class AuthService {
         );
     }
 
+    @Transactional
+    public void updateNickname(Long userId, String customNickname) {
+        if (userRepository.existsByCustomNickname(customNickname)) {
+            throw new IllegalStateException("이미 사용 중인 닉네임입니다");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다"));
+        user.updateCustomNickname(customNickname);
+    }
+
     @Transactional(readOnly = true)
     public UserResponse getMe(Long userId) {
         User user = userRepository.findById(userId)
