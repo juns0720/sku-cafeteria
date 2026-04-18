@@ -38,7 +38,7 @@
 - [x] **BE-A-3a**: V5 `add_review_triple_ratings` (nullable + CHECK)
 - [x] **BE-A-3b**: V6 `backfill_and_drop_rating` (3축 NOT NULL + `rating` DROP)
 - [x] **BE-A-3c**: V7 `add_review_image_url`
-- [ ] **BE-A-3d**: ReviewRequest/Response 3축 validation 최종
+- [x] **BE-A-3d**: ReviewRequest/Response 3축 validation 최종
 
 **Menu API 확장 + N+1 해결**
 - [ ] **BE-A-5a**: `findAggregated` JPQL + MenuService 재작성 (N+1 해결)
