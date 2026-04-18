@@ -8,8 +8,12 @@ public record ReviewResponse(
         String menuName,
         String userNickname,
         String userProfileImage,
-        int rating,
+        int taste,
+        int amount,
+        int value,
+        double overall,
         String comment,
+        String imageUrl,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         boolean isMine

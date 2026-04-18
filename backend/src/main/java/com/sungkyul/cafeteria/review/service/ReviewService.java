@@ -48,8 +48,11 @@ public class ReviewService {
         Review review = Review.builder()
                 .user(user)
                 .menu(menu)
-                .rating(request.rating())
+                .tasteRating(request.tasteRating())
+                .amountRating(request.amountRating())
+                .valueRating(request.valueRating())
                 .comment(request.comment())
+                .imageUrl(request.imageUrl())
                 .build();
 
         Review saved = reviewRepository.save(review);
@@ -84,7 +87,7 @@ public class ReviewService {
             throw new IllegalArgumentException("리뷰 수정 권한이 없습니다");
         }
 
-        review.update(request.rating(), request.comment());
+        review.update(request.tasteRating(), request.amountRating(), request.valueRating(), request.comment(), request.imageUrl());
         return toResponse(review, userId);
     }
 
@@ -98,8 +101,12 @@ public class ReviewService {
                 review.getMenu().getName(),
                 review.getUser().getNickname(),
                 review.getUser().getProfileImage(),
-                review.getRating(),
+                review.getTasteRating(),
+                review.getAmountRating(),
+                review.getValueRating(),
+                review.overallRating(),
                 review.getComment(),
+                review.getImageUrl(),
                 review.getCreatedAt(),
                 review.getUpdatedAt(),
                 isMine
