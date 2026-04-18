@@ -6,5 +6,5 @@ import jakarta.validation.constraints.Size;
 public record NicknameRequest(
         @NotBlank
         @Size(min = 2, max = 12)
-        String customNickname
+        String nickname
 ) {}

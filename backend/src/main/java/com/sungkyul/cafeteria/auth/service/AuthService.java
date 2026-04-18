@@ -68,31 +68,29 @@ public class AuthService {
         return new LoginResponse(
                 accessToken, refreshToken,
                 user.getId(), user.getNickname(),
-                user.getEmail(), user.getProfileImage()
+                user.getEmail(), user.getProfileImage(),
+                user.isNicknameSet()
         );
     }
 
     @Transactional
-    public void updateNickname(Long userId, String customNickname) {
-        if (userRepository.existsByCustomNickname(customNickname)) {
+    public void updateNickname(Long userId, String nickname) {
+        if (userRepository.existsByNicknameAndIdNot(nickname, userId)) {
             throw new IllegalStateException("이미 사용 중인 닉네임입니다");
         }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다"));
-        user.updateCustomNickname(customNickname);
+        user.changeNickname(nickname);
     }
 
     @Transactional(readOnly = true)
     public UserResponse getMe(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다"));
-        String displayName = user.getCustomNickname() != null
-                ? user.getCustomNickname()
-                : user.getNickname();
         return new UserResponse(
                 user.getId(), user.getGoogleId(),
                 user.getEmail(), user.getNickname(), user.getProfileImage(),
-                displayName
+                user.isNicknameSet()
         );
     }
 }

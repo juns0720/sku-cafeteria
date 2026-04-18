@@ -37,7 +37,7 @@ public class AuthController {
             @Valid @RequestBody NicknameRequest request,
             Authentication authentication) {
         Long userId = (Long) authentication.getPrincipal();
-        authService.updateNickname(userId, request.customNickname());
+        authService.updateNickname(userId, request.nickname());
         return ResponseEntity.ok().build();
     }
 }

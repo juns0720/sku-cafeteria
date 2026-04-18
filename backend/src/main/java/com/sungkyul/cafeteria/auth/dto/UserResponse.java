@@ -6,5 +6,5 @@ public record UserResponse(
         String email,
         String nickname,
         String profileImage,
-        String displayName
+        boolean isNicknameSet
 ) {}

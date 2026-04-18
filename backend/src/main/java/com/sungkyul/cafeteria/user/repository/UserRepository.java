@@ -7,11 +7,10 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    /** Google OAuth2 ID로 사용자 조회 (로그인 시 사용) */
     Optional<User> findByGoogleId(String googleId);
 
-    /** Google OAuth2 ID 중복 여부 확인 */
     boolean existsByGoogleId(String googleId);
 
-    boolean existsByCustomNickname(String customNickname);
+    /** 다른 사용자가 이미 동일 닉네임을 사용 중인지 확인 */
+    boolean existsByNicknameAndIdNot(String nickname, Long id);
 }
