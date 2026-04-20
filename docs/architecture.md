@@ -85,7 +85,7 @@ Long userId = (Long) authentication.getPrincipal();
 | 나머지 | * | authenticated |
 
 JWT 없는 authenticated 요청은 `AuthenticationEntryPoint`가 401 반환.
-CORS 허용 오리진은 `SecurityConfig.corsConfigurationSource()`에서 관리한다. 배포 시 Vercel 도메인을 추가해야 한다.
+CORS 허용 오리진은 `app.allowed-origins` 환경변수로 주입한다 (`SecurityConfig`에서 쉼표 분리). 로컬 기본값은 `http://localhost:5173`, prod에서는 Render 환경변수 `ALLOWED_ORIGINS`에 Vercel 도메인을 설정한다.
 
 `POST /api/cron/crawl`은 Spring Security에서 permitAll이지만, 컨트롤러 진입 시 `X-Cron-Secret` 헤더와 환경변수 `CRON_SECRET`를 비교해 불일치 시 401을 반환한다.
 
@@ -115,17 +115,32 @@ public void create(...) {
 
 자세한 구현은 [Phase 2 P2-T4](./plans/ui-ux-redesign/02-phase-2-backend.md) 참조.
 
+## Docker / 로컬 개발
+
+| 파일 | 역할 |
+|---|---|
+| `docker-compose.yml` (루트) | 로컬 개발용. `postgres` 서비스 단독 기동 또는 `--profile full`로 BE까지 |
+| `backend/Dockerfile` | 멀티 스테이지 빌드 (Gradle 빌드 → JRE 실행). Render 배포에서도 사용 |
+
+```bash
+docker compose up postgres -d           # PostgreSQL만 (일반 로컬 개발)
+docker compose --profile full up -d     # PostgreSQL + 백엔드 통합 검증
+```
+
+로컬 DB 접속: `localhost:5432`, DB `sungkyul_cafeteria`, user/pass `postgres/postgres`
+
 ## Configuration Profiles
 
 | 프로파일 | 용도 | ddl-auto | Flyway | 활성화 방법 |
 |---|---|---|---|---|
-| `dev` (기본) | 로컬 개발 | `update` | enabled | 기본값 |
-| `prod` | Railway 배포 | `validate` | enabled | `SPRING_PROFILES_ACTIVE=prod` |
+| `dev` (기본) | 로컬 개발 | `none` | enabled | 기본값 |
+| `prod` | Render 배포 | `validate` | enabled | `SPRING_PROFILES_ACTIVE=prod` |
 
-prod 프로파일 환경변수:
-- `SPRING_DATASOURCE_URL` / `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD`
-- `JWT_SECRET`
-- `CRON_SECRET` (P2-T13 이후)
+prod 프로파일 환경변수 (Render 대시보드에서 설정):
+- `SPRING_DATASOURCE_URL` / `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` — Supabase 연결 정보
+- `JWT_SECRET` — Render가 자동 생성(`generateValue`)
+- `CRON_SECRET` — Render가 자동 생성
+- `ALLOWED_ORIGINS` — 쉼표 구분 허용 오리진 (예: `https://sku-cafeteria.vercel.app,http://localhost:5173`)
 - `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` (Phase D 이후)
 
 ## Flyway 마이그레이션 이력
@@ -145,4 +160,4 @@ prod 프로파일 환경변수:
 | V11 | reviews.image_url DROP (롤백 불가) | 예정 P5-T2 |
 | V12 | users.nickname_changed_at | 예정 P2-T12 |
 
-스냅샷: V11 직전에 Railway PG 스냅샷 필수.
+스냅샷: V11 직전에 Supabase 프로젝트 백업 필수 (Supabase 대시보드 > Database > Backups).

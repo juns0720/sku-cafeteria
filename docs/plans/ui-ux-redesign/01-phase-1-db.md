@@ -9,7 +9,7 @@
 
 - **확장 후 축소(expand-contract)**: 새 컬럼은 nullable 또는 DEFAULT를 가져야 한다. NOT NULL 승격은 백필 후 별도 마이그레이션에서.
 - **백필은 idempotent**: `COALESCE`/`WHERE x IS NULL`로 재실행해도 안전하게.
-- **prod에서 스냅샷 필수**: V11(`image_url` DROP)은 되돌릴 수 없다. Phase 5 진입 전 Railway PG 스냅샷 확보.
+- **prod에서 스냅샷 필수**: V11(`image_url` DROP)은 되돌릴 수 없다. Phase 5 진입 전 Supabase 백업 확보 (대시보드 > Database > Backups).
 
 ---
 
@@ -202,7 +202,7 @@ SELECT COUNT(*) FROM users WHERE avatar_color !~ '^#[0-9A-Fa-f]{6}$';
 
 **선결조건**:
 - FE/BE 모두 `photo_urls`만 사용 (응답 DTO에서 imageUrl 필드 제거됨)
-- Railway PG 스냅샷 확보 완료
+- Supabase 백업 확보 완료 (대시보드 > Database > Backups)
 - 사용자 사전 승인
 
 **파일**: `V11__drop_review_image_url.sql`

@@ -20,11 +20,13 @@
 
 ### Step 4. 다음 단위의 Phase 파일 선택적 읽기
 
-- FE-B-* → `02-phase-b-profile.md`의 해당 단위 섹션
-- FE-C-* → `03-phase-c-ui.md`의 해당 단위 섹션
-- FE-D-* → `04-phase-d-photo.md`의 해당 단위 섹션
+- P3-T* → `docs/plans/ui-ux-redesign/03-phase-3-design-system.md`의 해당 단위 섹션
+- P4-T* → `docs/plans/ui-ux-redesign/04-phase-4-pages.md`의 해당 단위 섹션
+- PD-T* → `docs/plans/ui-ux-redesign/06-phase-d-photo.md`의 해당 단위 섹션
 
 **반드시 해당 단위 섹션만 읽는다** — 다른 Phase 파일 전체를 스캔하지 않는다.
+
+> `docs/plans/archive/ui-ux-v1-phases/`의 `02-phase-b-*.md` / `03-phase-c-*.md` 등은 **구버전 아카이브** — 참조 금지.
 
 ### Step 5. 디자인 토큰 확인 (필요 시)
 

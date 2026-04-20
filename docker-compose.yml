@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sungkyul-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sungkyul_cafeteria
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: sungkyul-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sungkyul_cafeteria
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-that-is-long-enough-for-hmac-sha256-ok}
+      CRON_SECRET: ${CRON_SECRET:-dev-only-do-not-use-in-prod}
+    ports:
+      - "8080:8080"
+    profiles:
+      - full   # postgres만 쓸 땐 docker compose up postgres
+
+volumes:
+  postgres_data:

@@ -134,7 +134,7 @@
 |---|---|---|---|
 | POST | `/api/v1/admin/crawl` | JWT (authenticated) | 학식 크롤링 수동 트리거 (개발자/관리자용) |
 | GET | `/api/v1/admin/crawl/debug` | JWT | 크롤링 디버그 정보 |
-| POST | `/api/cron/crawl` | `X-Cron-Secret` 헤더 | Railway cron job 트리거 (예정: P2-T13). `CRON_SECRET` env와 일치 시 200, 불일치/누락 시 401 |
+| POST | `/api/cron/crawl` | `X-Cron-Secret` 헤더 | 외부 cron 트리거 (예정: P2-T13). `CRON_SECRET` env와 일치 시 200, 불일치/누락 시 401 |
 
 > ⚠ AdminController는 현재 ROLE_ADMIN 분리 미구현(Known Issue). 일반 JWT로 접근 가능.
 

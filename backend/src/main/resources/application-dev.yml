@@ -17,6 +17,7 @@ spring:
         format_sql: true     # SQL 가독성 향상
 
 app:
+  allowed-origins: http://localhost:5173
   jwt:
     secret: ${JWT_SECRET:dev-secret-key-that-is-long-enough-for-hmac-sha256-ok}
     access-expiration: 3600000    # 1시간 (ms)

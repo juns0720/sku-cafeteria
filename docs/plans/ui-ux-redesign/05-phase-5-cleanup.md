@@ -41,7 +41,7 @@ frontend/src/pages/
 
 - [ ] FE 모든 페이지가 `photoUrls` 사용 (P3-T3, P4-T8/T9 완료)
 - [ ] BE 응답 DTO에서 `imageUrl` 필드 deprecated 표시 + 미참조 확인
-- [ ] **Railway PG 스냅샷 확보** (UI 또는 `pg_dump`)
+- [ ] **Supabase 백업 확보** (대시보드 > Database > Backups 또는 `pg_dump`)
 - [ ] **사용자 사전 승인**
 
 ### 작업
@@ -100,21 +100,22 @@ ALTER TABLE reviews DROP COLUMN image_url;
 
 ## P5-T4 · 배포
 
-### 백엔드 (Railway)
+### 백엔드 (Render)
 
-1. main 머지 → Railway 자동 배포
+1. main 머지 → Render 자동 배포 (`render.yaml` 기반)
 2. 기동 로그에서 Flyway V8~V11 적용 확인
-3. 환경변수 확인:
+3. 환경변수 확인 (Render 대시보드):
    - `JWT_SECRET`
-   - `SPRING_DATASOURCE_*`
+   - `SPRING_DATASOURCE_*` (Supabase 연결 정보)
    - `CRON_SECRET` (P2-T13에서 등록)
+   - `ALLOWED_ORIGINS` (Vercel 도메인 포함 여부)
    - `CLOUDINARY_*` (Phase D 진행 시)
 
 ### 프론트엔드 (Vercel)
 
 1. main 머지 → Vercel 자동 배포
 2. 프로덕션 URL 확인
-3. **CORS 갱신**: 프론트 도메인이 바뀌었거나 신규 추가되면 `backend/.../SecurityConfig.corsConfigurationSource()`의 `allowedOrigins`에 추가 → BE 재배포
+3. **CORS 갱신**: 프론트 도메인이 바뀌었거나 신규 추가되면 Render 환경변수 `ALLOWED_ORIGINS`에 추가 → Render 재시작 (코드 수정 불필요)
 
 ### 스모크 테스트 (프로덕션)
 

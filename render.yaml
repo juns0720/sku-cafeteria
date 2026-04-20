@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: sku-cafeteria-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false          # Render 대시보드에서 직접 입력
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true  # Render가 자동 생성
+      - key: CRON_SECRET
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false          # Vercel 배포 후 입력 (예: https://sku-cafeteria.vercel.app)

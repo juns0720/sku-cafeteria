@@ -103,14 +103,14 @@ Cloudinary는 **서명된 파라미터만 신뢰**한다. `allowed_formats`/`max
 
 ---
 
-## PD-T2 · Railway 환경변수 + 재배포
+## PD-T2 · Render 환경변수 + 재배포
 
-Railway UI:
+Render 대시보드 > Environment:
 - `CLOUDINARY_CLOUD_NAME`
 - `CLOUDINARY_API_KEY`
 - `CLOUDINARY_API_SECRET`
 
-main 머지 → 자동 재배포 → `GET /api/v1/reviews/upload-signature` 헬스체크.
+저장 후 Render 자동 재배포 → `GET /api/v1/reviews/upload-signature` 헬스체크.
 
 **검증**: 실제 Cloudinary 계정으로 end-to-end 업로드 확인
 

@@ -115,7 +115,7 @@ Phase 2 (BE)
   /api/cron/crawl + cron-secret
   GlobalExceptionHandler 정정 (IAE→400)
        │
-       ↓ 게이트: ./gradlew test + Railway 스테이징 스모크
+       ↓ 게이트: ./gradlew test + Render 배포 스모크
        ↓
 Phase 3 (FE 디자인 시스템)
   Tailwind/Google Fonts 설정
@@ -135,7 +135,7 @@ Phase 5 (정리)
   레거시 컴포넌트 삭제 (WeekTab/MyReviewsPage/ReviewsPage/MenuDetailModal/Header v1/BottomNav v1)
   V11 reviews.image_url DROP   ← 사용자 사전 승인 필수, 롤백 불가
   docs 정리
-  Railway + Vercel 배포 + CORS 갱신
+  Render 재배포 + Vercel 프로덕션 + CORS 갱신
 
 Phase D (별도 트랙, Phase 4 이후 병행 가능)
   Cloudinary 다중 파일 서명 → 환경변수 → FE 첨부 UX/라이트박스
@@ -154,13 +154,23 @@ Phase D (별도 트랙, Phase 4 이후 병행 가능)
 
 ## 배포·브랜치 전략
 
+### 배포 인프라
+
+| 역할 | 서비스 | 비고 |
+|---|---|---|
+| 백엔드 | **Render** (Free Web Service) | `render.yaml` 자동 감지, `backend/Dockerfile` 사용 |
+| DB | **Supabase** (Free) | PostgreSQL 500MB, 7일 비활성 시 일시정지 주의 |
+| 프론트엔드 | **Vercel** (Hobby) | `frontend/vercel.json`으로 SPA 라우팅 처리 |
+
+> Render 무료 플랜은 15분 비활성 시 슬립 → 첫 요청 콜드 스타트 ~30~60초.
+
 ### 배포 순서
 
 1. **Phase 2 단독 배포(스테이징)**: 응답 확장만, 기존 시그니처 유지 → 프론트가 깨지지 않음.
 2. **Phase 4 일괄 배포(프론트 페이지 전환)**: feature 브랜치에서 페이지 단위 머지 후 Vercel preview → 프로덕션.
-3. **CORS 갱신**: 프론트 도메인이 바뀔 때만 `SecurityConfig.corsConfigurationSource()` 수정 후 BE 재배포.
-4. **Phase 5 V11**: prod DB 스냅샷 확보 후 image_url DROP.
-5. **Phase D**: BE → 환경변수 → FE 순.
+3. **CORS 갱신**: Render 환경변수 `ALLOWED_ORIGINS`에 Vercel 도메인 추가 → Render 재시작. 코드 수정 불필요.
+4. **Phase 5 V11**: Supabase 백업 확보 후 image_url DROP.
+5. **Phase D**: BE → Render 환경변수(`CLOUDINARY_*`) → FE 순.
 
 ### 브랜치
 
@@ -174,8 +184,8 @@ Phase D (별도 트랙, Phase 4 이후 병행 가능)
 ### 롤백
 
 - Flyway Community Edition은 Undo 미지원.
-- **V11의 `image_url` DROP은 되돌리기 불가** → Phase 5 직전 **Railway PG 스냅샷 필수**.
-- 문제 시 스냅샷 복원 + 이전 커밋 재배포.
+- **V11의 `image_url` DROP은 되돌리기 불가** → Phase 5 직전 **Supabase 백업 필수** (대시보드 > Database > Backups).
+- 문제 시 백업 복원 + 이전 커밋 재배포.
 
 ---
 
@@ -183,10 +193,15 @@ Phase D (별도 트랙, Phase 4 이후 병행 가능)
 
 | 변수 | 위치 | 도입 시점 |
 |---|---|---|
-| `CRON_SECRET` | Railway | Phase 2 (Task 2-13) |
-| `CLOUDINARY_CLOUD_NAME` | Railway | Phase D |
-| `CLOUDINARY_API_KEY` | Railway | Phase D |
-| `CLOUDINARY_API_SECRET` | Railway | Phase D |
+| `SPRING_DATASOURCE_URL` | Render | 초기 배포 (Supabase JDBC URL) |
+| `SPRING_DATASOURCE_USERNAME` | Render | 초기 배포 |
+| `SPRING_DATASOURCE_PASSWORD` | Render | 초기 배포 |
+| `JWT_SECRET` | Render (generateValue) | 초기 배포 |
+| `CRON_SECRET` | Render (generateValue) | Phase 2 (Task 2-13) |
+| `ALLOWED_ORIGINS` | Render | 초기 배포 (Vercel 도메인 쉼표 구분) |
+| `CLOUDINARY_CLOUD_NAME` | Render | Phase D |
+| `CLOUDINARY_API_KEY` | Render | Phase D |
+| `CLOUDINARY_API_SECRET` | Render | Phase D |
 
 ---
 

@@ -449,5 +449,5 @@ public ResponseEntity<ErrorResponse> handleForbidden(AccessDeniedException e) {
 ## Phase 2 게이트
 
 - `./gradlew test` 전체 통과
-- Railway 스테이징 배포 → Postman 컬렉션 스모크 (모든 신규 엔드포인트 + 기존 엔드포인트 회귀)
+- Render 배포 → Postman 컬렉션 스모크 (모든 신규 엔드포인트 + 기존 엔드포인트 회귀)
 - 이번 시점엔 프론트가 깨지지 않아야 한다 (확장만, 기존 시그니처 유지). 깨지면 Phase 2 작업 누락.

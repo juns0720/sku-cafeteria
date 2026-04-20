@@ -40,7 +40,7 @@
 - [x] **P1-T2**: V9 — `menu_dates.meal_slot` 추가(default `LUNCH`, CHECK) + UNIQUE를 `(menu_id, served_date, meal_slot)`로 재정의
 - [x] **P1-T3**: V10 — `reviews.photo_urls TEXT[]` 추가(NOT NULL DEFAULT `{}`, CHECK ≤3) + `image_url` 백필
 - [x] **P1-T4**: V10(계속) — `users.avatar_color VARCHAR(7) NOT NULL DEFAULT '#EF8A3D'`
-- [ ] **P1-T5**: V11(Phase 5에서 실행) — `reviews.image_url` DROP. **사전 조건**: FE/BE photo_urls 전환 + Railway PG 스냅샷.
+- [ ] **P1-T5**: V11(Phase 5에서 실행) — `reviews.image_url` DROP. **사전 조건**: FE/BE photo_urls 전환 + Supabase 백업.
 
 ---
 
@@ -58,11 +58,11 @@
 - [x] **P2-T10**: `ReviewResponse`에 `photoUrls`, `authorBadgeTier` 추가 (배치 조회로 N+1 방지)
 - [x] **P2-T11**: `UserResponse`/`AuthService.getMe` 확장 (`badgeTier/nextTarget/remaining/avatarColor/avgRating/reviewCount/badgeCount`)
 - [x] **P2-T12**: 닉네임 30일 쿨다운 — `users.nickname_changed_at` 컬럼 추가(별도 마이그레이션) + 검증
-- [ ] **P2-T13**: `POST /api/cron/crawl` + `X-Cron-Secret` 헤더 검증 (`CRON_SECRET` env)
-- [ ] **P2-T14**: 크롤러 `meal_slot=LUNCH` 명시 + Corner 매핑 적용
-- [ ] **P2-T15**: `GlobalExceptionHandler` 정정 — `IllegalArgumentException` → 400 (현재 403)
+- [x] **P2-T13**: `POST /api/cron/crawl` + `X-Cron-Secret` 헤더 검증 (`CRON_SECRET` env)
+- [x] **P2-T14**: 크롤러 `meal_slot=LUNCH` 명시 + Corner 매핑 적용
+- [x] **P2-T15**: `GlobalExceptionHandler` 정정 — `IllegalArgumentException` → 400 (현재 403)
 
-> **Phase 2 게이트**: `./gradlew test` 전체 통과 + Railway 스테이징 배포 + Postman 컬렉션 스모크 통과 → Phase 3.
+> **Phase 2 게이트**: `./gradlew test` 전체 통과 + Render 배포 + Postman 컬렉션 스모크 통과 → Phase 3.
 
 ---
 
@@ -100,14 +100,14 @@
 - [ ] **P5-T1**: 레거시 컴포넌트/페이지 삭제 — `WeekTab.jsx`, `MyReviewsPage.jsx`, 기존 `ReviewsPage.jsx`, `MenuDetailModal.jsx`, 기존 `BottomNav.jsx`, 기존 `Header.jsx`(또는 hi/ 버전으로 교체)
 - [ ] **P5-T2**: V11 `reviews.image_url` DROP — Phase 5 직전 prod DB 스냅샷 필수
 - [ ] **P5-T3**: docs 정리 — 본 문서 + `00-overview.md` + `docs/api.md`/`architecture.md` 갱신, archive 링크 정상 확인
-- [ ] **P5-T4**: 배포 — Railway 재배포 + Vercel 프로덕션 + CORS 갱신
+- [ ] **P5-T4**: 배포 — Render 재배포 + Vercel 프로덕션 + CORS 갱신 (Render 환경변수 `ALLOWED_ORIGINS` 업데이트)
 
 ---
 
 ## Phase D — 사진 업로드 (별도 트랙, Phase 4 이후 병행 가능)
 
 - [ ] **PD-T1**: BE — Cloudinary 빈 + gradle 의존성 + application.yml + 다중 파일 서명 (`GET /reviews/upload-signature`)
-- [ ] **PD-T2**: Railway 환경변수(`CLOUDINARY_*`) 등록 + 재배포
+- [ ] **PD-T2**: Render 환경변수(`CLOUDINARY_*`) 등록 + 재배포
 - [ ] **PD-T3**: FE — `api/upload.js` + `ReviewWritePage` 첨부 UX (5MB/each, 0~3장, jpeg/png/webp) + 썸네일 + 라이트박스 + 업로드 실패 폴백
 
 ---
