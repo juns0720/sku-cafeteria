@@ -6,9 +6,9 @@ import BottomNav from './components/BottomNav'
 import HomePage from './pages/HomePage'
 import WeeklyPage from './pages/WeeklyPage'
 import ReviewsPage from './pages/ReviewsPage'
-import MyReviewsPage from './pages/MyReviewsPage'
 import DevComponentsPage from './pages/DevComponentsPage'
 import LoginPage from './pages/LoginPage'
+import ProfilePage from './pages/ProfilePage'
 import NicknameSetupModal from './components/hi/NicknameSetupModal'
 import useAuth from './hooks/useAuth'
 import useToast from './hooks/useToast.jsx'
@@ -69,7 +69,8 @@ function AppInner() {
       <Route path="/" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" replace />} />
       <Route path="/weekly" element={isLoggedIn ? <WeeklyPage /> : <Navigate to="/login" replace />} />
       <Route path="/reviews" element={isLoggedIn ? <ReviewsPage /> : <Navigate to="/login" replace />} />
-      <Route path="/my-reviews" element={isLoggedIn ? <MyReviewsPage /> : <Navigate to="/login" replace />} />
+      <Route path="/profile" element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" replace />} />
+      <Route path="/my-reviews" element={<Navigate to="/profile" replace />} />
       <Route path="/dev/components" element={<DevComponentsPage />} />
       <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} replace />} />
     </Routes>

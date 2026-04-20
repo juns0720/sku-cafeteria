@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { checkNicknameAvailability, updateNickname } from '../../api/users'
 import {
   NICKNAME_AVAILABILITY_DELAY_MS,
+  normalizeNickname,
   validateNickname,
 } from '../../lib/nickname'
 import Card from './Card'
@@ -11,6 +12,7 @@ import Icon from './Icon'
 import UL from './UL'
 
 const AUTH_ME_QUERY_KEY = ['auth', 'me']
+const MY_REVIEWS_QUERY_KEY = ['reviews', 'me']
 const NICKNAME_SUGGESTIONS = [
   '학식탐험가',
   '오늘도한끼',
@@ -41,18 +43,29 @@ function toAvailabilityState(response) {
   }
 }
 
-export default function NicknameSetupModal({ onClose }) {
+export default function NicknameSetupModal({
+  onClose,
+  mode = 'setup',
+  initialNickname = '',
+}) {
   const queryClient = useQueryClient()
   const inputRef = useRef(null)
-  const [nickname, setNickname] = useState('')
+  const isEditMode = mode === 'edit'
+  const initialNormalizedNickname = normalizeNickname(initialNickname)
+  const [nickname, setNickname] = useState(initialNickname)
   const [submitError, setSubmitError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isComposing, setIsComposing] = useState(false)
   const [availability, setAvailability] = useState(INITIAL_AVAILABILITY)
   const [availabilityCache, setAvailabilityCache] = useState(() => new Map())
+  const canClose = isEditMode && !isSubmitting
 
   const localValidation = validateNickname(nickname)
   const normalizedNickname = localValidation.normalizedNickname
+  const isUnchanged =
+    isEditMode &&
+    normalizedNickname.length > 0 &&
+    normalizedNickname === initialNormalizedNickname
   const cachedAvailability = localValidation.isValid
     ? availabilityCache.get(normalizedNickname)
     : null
@@ -65,11 +78,13 @@ export default function NicknameSetupModal({ onClose }) {
   const isCheckingAvailability =
     Boolean(nickname) &&
     localValidation.isValid &&
+    !isUnchanged &&
     !isComposing &&
     !hasCachedAvailability &&
     currentAvailability.normalizedNickname !== normalizedNickname
   const isSubmitDisabled =
     !localValidation.isValid ||
+    isUnchanged ||
     currentAvailability.status !== 'available' ||
     isSubmitting ||
     isComposing
@@ -80,6 +95,8 @@ export default function NicknameSetupModal({ onClose }) {
   if (submitError) {
     helperMessage = submitError
     helperColor = 'text-red'
+  } else if (isUnchanged) {
+    helperMessage = '현재 사용 중인 닉네임이에요'
   } else if (nickname && !localValidation.isValid) {
     helperMessage = localValidation.message
     helperColor = 'text-red'
@@ -109,7 +126,11 @@ export default function NicknameSetupModal({ onClose }) {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
         event.preventDefault()
-        event.stopPropagation()
+        if (canClose) {
+          onClose()
+        } else {
+          event.stopPropagation()
+        }
       }
     }
 
@@ -120,10 +141,23 @@ export default function NicknameSetupModal({ onClose }) {
       window.clearTimeout(focusTimer)
       window.removeEventListener('keydown', handleKeyDown, true)
     }
-  }, [])
+  }, [canClose, onClose])
 
   useEffect(() => {
-    if (!nickname || !localValidation.isValid || isComposing || hasCachedAvailability) {
+    setNickname(initialNickname)
+    setSubmitError('')
+    setAvailability(INITIAL_AVAILABILITY)
+    setAvailabilityCache(new Map())
+  }, [initialNickname, mode])
+
+  useEffect(() => {
+    if (
+      !nickname ||
+      !localValidation.isValid ||
+      isComposing ||
+      hasCachedAvailability ||
+      isUnchanged
+    ) {
       return undefined
     }
 
@@ -165,6 +199,7 @@ export default function NicknameSetupModal({ onClose }) {
     normalizedNickname,
     isComposing,
     hasCachedAvailability,
+    isUnchanged,
   ])
 
   const handleSuggestionClick = (suggestion) => {
@@ -200,6 +235,7 @@ export default function NicknameSetupModal({ onClose }) {
         }
       })
       queryClient.invalidateQueries({ queryKey: AUTH_ME_QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: MY_REVIEWS_QUERY_KEY })
       onClose()
     } catch (error) {
       const status = error.response?.status
@@ -225,22 +261,46 @@ export default function NicknameSetupModal({ onClose }) {
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-[rgba(43,34,24,0.34)] px-4 py-6 animate-fadeIn">
+    <div
+      className="fixed inset-0 z-[90] flex items-center justify-center bg-[rgba(43,34,24,0.34)] px-4 py-6 animate-fadeIn"
+      onMouseDown={(event) => {
+        if (canClose && event.target === event.currentTarget) {
+          onClose()
+        }
+      }}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="nickname-setup-title"
         className="w-full max-w-[420px] rounded-[28px] border-[1.5px] border-ink bg-paper shadow-pop animate-slideUp"
       >
-        <div className="border-b border-dashed border-rule px-5 py-4">
-          <div className="font-hand text-sm text-mute">2 / 2 · 마지막 단계</div>
+        <div className="relative border-b border-dashed border-rule px-5 py-4">
+          {isEditMode && (
+            <button
+              type="button"
+              aria-label="닉네임 편집 닫기"
+              disabled={!canClose}
+              onClick={() => {
+                if (canClose) {
+                  onClose()
+                }
+              }}
+              className="absolute right-4 top-4 rounded-full border border-rule bg-white p-2 text-ink transition-transform active:scale-[0.97]"
+            >
+              <Icon name="x" size={14} />
+            </button>
+          )}
+          <div className="font-hand text-sm text-mute">
+            {isEditMode ? '프로필 설정' : '2 / 2 · 마지막 단계'}
+          </div>
           <h2
             id="nickname-setup-title"
             className="mt-2 font-disp text-[1.9rem] leading-[1.15] text-ink"
           >
-            리뷰에서
+            {isEditMode ? '프로필에서' : '리뷰에서'}
             <br />
-            <UL>닉네임</UL>을 정해주세요
+            <UL>닉네임</UL>을 {isEditMode ? '바꿔볼까요?' : '정해주세요'}
           </h2>
         </div>
 
@@ -265,7 +325,7 @@ export default function NicknameSetupModal({ onClose }) {
                   setIsComposing(false)
                   setNickname(event.target.value)
                 }}
-                placeholder="닉네임을 입력하세요"
+                placeholder={isEditMode ? '새 닉네임을 입력하세요' : '닉네임을 입력하세요'}
                 className="min-w-0 flex-1 border-none bg-transparent font-user text-[1.55rem] leading-none text-ink outline-none placeholder:font-hand placeholder:text-lg placeholder:text-mute"
               />
               <span className="mb-[2px] inline-block h-7 w-[2px] animate-pulse rounded-full bg-orange" />
@@ -287,7 +347,9 @@ export default function NicknameSetupModal({ onClose }) {
                 <Icon name="pencil" size={16} color="#EF8A3D" />
               </span>
               <p className="font-hand text-sm leading-5 text-inkSoft">
-                한 번 정하면 30일 동안 변경하기 어려워요
+                {isEditMode
+                  ? '닉네임 변경은 30일에 한 번만 가능해요'
+                  : '한 번 정하면 30일 동안 변경하기 어려워요'}
               </p>
             </div>
           </div>
@@ -325,7 +387,13 @@ export default function NicknameSetupModal({ onClose }) {
                 : 'bg-ink text-paper active:scale-[0.99]'
             }`}
           >
-            <span>{isSubmitting ? '저장 중...' : '시작하기'}</span>
+            <span>
+              {isSubmitting
+                ? '저장 중...'
+                : isEditMode
+                  ? '저장하기'
+                  : '시작하기'}
+            </span>
             <Icon
               name="chevR"
               size={16}
