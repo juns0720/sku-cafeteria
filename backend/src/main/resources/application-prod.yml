@@ -16,6 +16,9 @@ spring:
       hibernate:
         format_sql: false
 
+cron:
+  secret: ${CRON_SECRET}
+
 logging:
   level:
     root: INFO
