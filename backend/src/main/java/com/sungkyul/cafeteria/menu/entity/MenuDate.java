@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Table(
         name = "menu_dates",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_menu_date", columnNames = {"menu_id", "served_date"})
+                @UniqueConstraint(name = "uk_menu_date_slot", columnNames = {"menu_id", "served_date", "meal_slot"})
         }
 )
 @Getter
@@ -28,4 +28,8 @@ public class MenuDate {
 
     @Column(nullable = false)
     private LocalDate servedDate;
+
+    @Column(name = "meal_slot", nullable = false)
+    @Builder.Default
+    private String mealSlot = "LUNCH";
 }

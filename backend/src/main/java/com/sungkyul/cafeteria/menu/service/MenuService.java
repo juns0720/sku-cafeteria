@@ -67,9 +67,10 @@ public class MenuService {
     }
 
     @Transactional(readOnly = true)
-    public TodayMenuResponse getTodayMenus(String corner) {
+    public TodayMenuResponse getTodayMenus(String corner, String slot) {
         LocalDate today = LocalDate.now();
-        List<MenuDate> menuDates = menuDateRepository.findByServedDateFetchMenu(today);
+        String resolvedSlot = (slot == null || slot.isBlank()) ? "LUNCH" : slot.toUpperCase();
+        List<MenuDate> menuDates = menuDateRepository.findByServedDateAndMealSlotFetchMenu(today, resolvedSlot);
         Map<Long, MenuAggregateProjection> projMap = buildProjectionMap(corner);
 
         List<MenuResponse> responses = menuDates.stream()

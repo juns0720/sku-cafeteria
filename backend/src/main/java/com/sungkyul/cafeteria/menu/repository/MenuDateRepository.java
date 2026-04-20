@@ -16,6 +16,10 @@ public interface MenuDateRepository extends JpaRepository<MenuDate, Long> {
     @Query("SELECT md FROM MenuDate md JOIN FETCH md.menu WHERE md.servedDate = :date")
     List<MenuDate> findByServedDateFetchMenu(@Param("date") LocalDate date);
 
+    /** 특정 날짜 + slot 조회 — slot 파라미터 지원 */
+    @Query("SELECT md FROM MenuDate md JOIN FETCH md.menu WHERE md.servedDate = :date AND md.mealSlot = :slot")
+    List<MenuDate> findByServedDateAndMealSlotFetchMenu(@Param("date") LocalDate date, @Param("slot") String slot);
+
     /** 날짜 범위로 메뉴 조회 — menu 페치 조인으로 N+1 방지 */
     @Query("SELECT md FROM MenuDate md JOIN FETCH md.menu WHERE md.servedDate BETWEEN :start AND :end")
     List<MenuDate> findByServedDateBetweenFetchMenu(@Param("start") LocalDate start, @Param("end") LocalDate end);

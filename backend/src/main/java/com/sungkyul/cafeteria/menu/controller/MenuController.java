@@ -44,9 +44,10 @@ public class MenuController {
 
     @GetMapping("/today")
     public ResponseEntity<TodayMenuResponse> getToday(
-            @RequestParam(required = false) String corner
+            @RequestParam(required = false) String corner,
+            @RequestParam(defaultValue = "LUNCH") String slot
     ) {
-        return ResponseEntity.ok(menuService.getTodayMenus(corner));
+        return ResponseEntity.ok(menuService.getTodayMenus(corner, slot));
     }
 
     @GetMapping("/weekly")

@@ -53,7 +53,7 @@
 - [x] **P2-T5**: `MenuResponse` 확장 (`tier/isNew/firstSeenAt/avgTaste/Amount/Value/Overall`) — 기존 `averageRating/reviewCount` 호환 유지
 - [x] **P2-T6**: `GET /menus?scope=all|reviewed` 파라미터 (default `reviewed`)
 - [x] **P2-T7**: `GET /menus/best` (이번 주 + 리뷰 ≥ 3 + 평균 desc + TOP 5)
-- [ ] **P2-T8**: `GET /menus/today?slot=LUNCH` slot 파라미터
+- [x] **P2-T8**: `GET /menus/today?slot=LUNCH` slot 파라미터
 - [ ] **P2-T9**: `ReviewRequest`/`ReviewUpdateRequest`에 `photoUrls: List<String>` 추가 (image_url 호환 유지, 0~3장)
 - [ ] **P2-T10**: `ReviewResponse`에 `photoUrls`, `authorBadgeTier` 추가 (배치 조회로 N+1 방지)
 - [ ] **P2-T11**: `UserResponse`/`AuthService.getMe` 확장 (`badgeTier/nextTarget/remaining/avatarColor/avgRating/reviewCount/badgeCount`)
