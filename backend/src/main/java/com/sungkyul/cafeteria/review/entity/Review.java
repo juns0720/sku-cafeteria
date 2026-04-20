@@ -8,9 +8,12 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(
@@ -52,9 +55,15 @@ public class Review {
     @Column(name = "value_rating", nullable = false)
     private int valueRating;
 
+    @Deprecated
     @Size(max = 500)
     @Column(name = "image_url", length = 500)
     private String imageUrl;
+
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "photo_urls", columnDefinition = "text[]")
+    @Builder.Default
+    private String[] photoUrls = new String[0];
 
     @Size(max = 500)
     @Column(length = 500)
@@ -72,11 +81,11 @@ public class Review {
         return (tasteRating + amountRating + valueRating) / 3.0;
     }
 
-    public void update(int tasteRating, int amountRating, int valueRating, String comment, String imageUrl) {
+    public void update(int tasteRating, int amountRating, int valueRating, String comment, List<String> photoUrls) {
         this.tasteRating = tasteRating;
         this.amountRating = amountRating;
         this.valueRating = valueRating;
         this.comment = comment;
-        this.imageUrl = imageUrl;
+        this.photoUrls = photoUrls != null ? photoUrls.toArray(new String[0]) : new String[0];
     }
 }

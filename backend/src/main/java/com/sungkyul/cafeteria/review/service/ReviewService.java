@@ -46,6 +46,7 @@ public class ReviewService {
 
         User user = userRepository.getReferenceById(userId);
 
+        List<String> photos = resolvePhotoUrls(request.photoUrls(), request.imageUrl());
         Review review = Review.builder()
                 .user(user)
                 .menu(menu)
@@ -54,6 +55,7 @@ public class ReviewService {
                 .valueRating(request.valueRating())
                 .comment(request.comment())
                 .imageUrl(request.imageUrl())
+                .photoUrls(photos.toArray(new String[0]))
                 .build();
 
         Review saved = reviewRepository.save(review);
@@ -91,9 +93,16 @@ public class ReviewService {
             throw new IllegalArgumentException("리뷰 수정 권한이 없습니다");
         }
 
-        review.update(request.tasteRating(), request.amountRating(), request.valueRating(), request.comment(), request.imageUrl());
+        List<String> photos = resolvePhotoUrls(request.photoUrls(), request.imageUrl());
+        review.update(request.tasteRating(), request.amountRating(), request.valueRating(), request.comment(), photos);
         recomputeMenuStats(review.getMenu().getId());
         return toResponse(review, userId);
+    }
+
+    private List<String> resolvePhotoUrls(List<String> photoUrls, String imageUrl) {
+        if (photoUrls != null && !photoUrls.isEmpty()) return photoUrls;
+        if (imageUrl != null && !imageUrl.isBlank()) return List.of(imageUrl);
+        return List.of();
     }
 
     private void recomputeMenuStats(Long menuId) {
