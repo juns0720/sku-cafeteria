@@ -68,11 +68,11 @@
 
 ## Phase 3 — 프론트 디자인 시스템
 
-- [ ] **P3-T1**: Tailwind 토큰 등록 (컬러 14종 / 그림자 3종 / 폰트 2종) + Google Fonts(Gaegu/Jua) import + `--font-hand`/`--font-disp` CSS 변수
-- [ ] **P3-T2**: `api/menus.js`, `api/users.js` 신설 (FE-B-1 흡수)
-- [ ] **P3-T3**: `api/reviews.js` 3축 + photoUrls 시그니처 (P0 버그 fix)
-- [ ] **P3-T4**: `components/hi/` 기초 9종 — Icon(14 SVG)/FoodIllust/Pill/Card/Button/Stars/UL/SecLabel/AxisBar + `/dev/components` 카탈로그
-- [ ] **P3-T5**: `components/hi/` 컴포지트 10종 — TabBarHi/BestCarousel/WeekDayTabs/CornerFilterChips/MedalSticker/MultiStarRating/MultiStarSummary/BadgeProgressBar/StatsGrid/EmptyState
+- [x] **P3-T1**: Tailwind 토큰 등록 (컬러 14종 / 그림자 3종 / 폰트 2종) + Google Fonts(Gaegu/Jua) import + `--font-hand`/`--font-disp` CSS 변수
+- [x] **P3-T2**: `api/menus.js`, `api/users.js` 신설 (FE-B-1 흡수)
+- [x] **P3-T3**: `api/reviews.js` 3축 + photoUrls 시그니처 (P0 버그 fix)
+- [x] **P3-T4**: `components/hi/` 기초 9종 — Icon(14 SVG)/FoodIllust/Pill/Card/Button/Stars/UL/SecLabel/AxisBar + `/dev/components` 카탈로그
+- [x] **P3-T5**: `components/hi/` 컴포지트 10종 — TabBarHi/BestCarousel/WeekDayTabs/CornerFilterChips/MedalSticker/MultiStarRating/MultiStarSummary/BadgeProgressBar/StatsGrid/EmptyState
 
 > **Phase 3 게이트**: `npm run build` 성공 + `/dev/components`에서 모든 컴포넌트 시각 확인 (375/768/1280) → Phase 4.
 

@@ -34,6 +34,8 @@ npm run build    # 프로덕션 빌드
 npm run lint     # ESLint
 ```
 
+`frontend/src/api/` — 도메인별 분리: `client.js`(axios 인터셉터) + `auth.js` / `menus.js` / `reviews.js` / `users.js`
+
 ## Docs
 
 - @docs/plans/README.md — **활성 플랜 + 진행 상황 허브**
@@ -53,7 +55,7 @@ npm run lint     # ESLint
 - 단위 완료 시 `docs/plans/ui-ux-redesign/99-progress.md` 체크박스만 갱신
 - 신규 v2 컴포넌트는 `frontend/src/components/hi/` 하위 (기존 `components/`는 v1)
 - `position: fixed` UI는 `createPortal(…, document.body)` 사용
-- FE 검증: 375 / 768 / 1280 뷰포트 브라우저 확인
+- FE 검증: 375 / 768 / 1280 뷰포트 브라우저 확인 — 컴포넌트 단위는 `/dev/components` 카탈로그로
 - `git commit` / `git push`는 사용자가 직접
 
 ## /init 규칙
