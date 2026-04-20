@@ -38,8 +38,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e) {
         return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(ErrorResponse.of(403, e.getMessage()));
+                .badRequest()
+                .body(ErrorResponse.of(400, e.getMessage()));
     }
 
     @ExceptionHandler(NicknameCooldownException.class)
