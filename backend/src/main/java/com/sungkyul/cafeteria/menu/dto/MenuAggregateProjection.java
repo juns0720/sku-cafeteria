@@ -9,5 +9,8 @@ public record MenuAggregateProjection(
         LocalDate firstSeenAt,
         LocalDate latestServedDate,
         Double averageRating,
-        Long reviewCount
+        Long reviewCount,
+        Double avgTaste,
+        Double avgAmount,
+        Double avgValue
 ) {}

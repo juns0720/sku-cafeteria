@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -32,6 +33,13 @@ public class Menu {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // V8 — 최초/최근 등장일
+    @Column(name = "first_seen_at")
+    private LocalDate firstSeenAt;
+
+    @Column(name = "last_seen_at")
+    private LocalDate lastSeenAt;
 
     // 집계 캐시 (V8, recomputeMenuStats 로 갱신)
     @Column(name = "avg_taste")

@@ -50,7 +50,7 @@
 - [x] **P2-T2**: `BadgeTier` enum + `of(long)` (1/5/30 임계값)
 - [x] **P2-T3**: `MenuTier` enum + `of(Double avg, Long count)` (4.5/4.0/3.5 임계값)
 - [x] **P2-T4**: `ReviewService.create/update/delete`에서 `recomputeMenuStats(menuId)` 트랜잭션 호출
-- [ ] **P2-T5**: `MenuResponse` 확장 (`tier/isNew/firstSeenAt/avgTaste/Amount/Value/Overall`) — 기존 `averageRating/reviewCount` 호환 유지
+- [x] **P2-T5**: `MenuResponse` 확장 (`tier/isNew/firstSeenAt/avgTaste/Amount/Value/Overall`) — 기존 `averageRating/reviewCount` 호환 유지
 - [ ] **P2-T6**: `GET /menus?scope=all|reviewed` 파라미터 (default `reviewed`)
 - [ ] **P2-T7**: `GET /menus/best` (이번 주 + 리뷰 ≥ 3 + 평균 desc + TOP 5)
 - [ ] **P2-T8**: `GET /menus/today?slot=LUNCH` slot 파라미터

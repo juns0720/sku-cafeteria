@@ -1,5 +1,6 @@
 package com.sungkyul.cafeteria.menu.service;
 
+import com.sungkyul.cafeteria.menu.domain.MenuTier;
 import com.sungkyul.cafeteria.menu.dto.MenuAggregateProjection;
 import com.sungkyul.cafeteria.menu.dto.MenuResponse;
 import com.sungkyul.cafeteria.menu.dto.TodayMenuResponse;
@@ -112,13 +113,22 @@ public class MenuService {
     }
 
     private MenuResponse toResponse(MenuAggregateProjection proj, LocalDate servedDate) {
+        boolean isNew = proj.firstSeenAt() != null
+                && !proj.firstSeenAt().isBefore(LocalDate.now().minusDays(7));
         return new MenuResponse(
                 proj.id(),
                 proj.name(),
                 proj.corner(),
                 servedDate,
                 proj.averageRating(),
-                proj.reviewCount()
+                proj.reviewCount(),
+                MenuTier.of(proj.averageRating(), proj.reviewCount() != null ? proj.reviewCount() : 0L),
+                isNew,
+                proj.firstSeenAt(),
+                proj.avgTaste(),
+                proj.avgAmount(),
+                proj.avgValue(),
+                proj.averageRating()
         );
     }
 }

@@ -23,10 +23,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     @Query("""
         SELECT new com.sungkyul.cafeteria.menu.dto.MenuAggregateProjection(
             m.id, m.name, m.corner,
-            (SELECT MIN(md.servedDate) FROM MenuDate md WHERE md.menu = m),
-            (SELECT MAX(md.servedDate) FROM MenuDate md WHERE md.menu = m),
-            (SELECT AVG((r.tasteRating + r.amountRating + r.valueRating) / 3.0) FROM Review r WHERE r.menu = m),
-            (SELECT COUNT(r) FROM Review r WHERE r.menu = m)
+            m.firstSeenAt,
+            m.lastSeenAt,
+            m.avgOverall,
+            CAST(m.reviewCount AS long),
+            m.avgTaste, m.avgAmount, m.avgValue
         )
         FROM Menu m
         WHERE (:corner IS NULL OR m.corner = :corner)
@@ -37,10 +38,11 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     @Query("""
         SELECT new com.sungkyul.cafeteria.menu.dto.MenuAggregateProjection(
             m.id, m.name, m.corner,
-            (SELECT MIN(md.servedDate) FROM MenuDate md WHERE md.menu = m),
-            (SELECT MAX(md.servedDate) FROM MenuDate md WHERE md.menu = m),
-            (SELECT AVG((r.tasteRating + r.amountRating + r.valueRating) / 3.0) FROM Review r WHERE r.menu = m),
-            (SELECT COUNT(r) FROM Review r WHERE r.menu = m)
+            m.firstSeenAt,
+            m.lastSeenAt,
+            m.avgOverall,
+            CAST(m.reviewCount AS long),
+            m.avgTaste, m.avgAmount, m.avgValue
         )
         FROM Menu m
         WHERE m.id = :menuId
