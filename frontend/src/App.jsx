@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage'
 import WeeklyPage from './pages/WeeklyPage'
 import ReviewsPage from './pages/ReviewsPage'
 import MyReviewsPage from './pages/MyReviewsPage'
+import DevComponentsPage from './pages/DevComponentsPage'
 import useAuth from './hooks/useAuth'
 import useToast from './hooks/useToast.jsx'
 
@@ -44,6 +45,7 @@ function AppInner() {
           <Route path="/weekly" element={<WeeklyPage />} />
           <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/my-reviews" element={<MyReviewsPage />} />
+          <Route path="/dev/components" element={<DevComponentsPage />} />
         </Routes>
       </main>
       <BottomNav />
