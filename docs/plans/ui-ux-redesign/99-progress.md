@@ -62,7 +62,7 @@
 - [x] **P2-T14**: 크롤러 `meal_slot=LUNCH` 명시 + Corner 매핑 적용
 - [x] **P2-T15**: `GlobalExceptionHandler` 정정 — `IllegalArgumentException` → 400 (현재 403)
 
-> **Phase 2 게이트**: `./gradlew test` 전체 통과 + Render 배포 + Postman 컬렉션 스모크 통과 → Phase 3.
+> **Phase 2 게이트 완료 (2026-04-20)**: `./gradlew test` 31건 전원 통과 + Render 배포(`https://sku-cafeteria-backend.onrender.com`) + 스모크 테스트 통과 → Phase 3 진입.
 
 ---
 

@@ -14,8 +14,8 @@ public class CrawlerScheduler {
 
     private final MenuCrawlerService menuCrawlerService;
 
-    /** 매주 월요일 오전 8시 자동 실행 */
-    @Scheduled(cron = "0 0 8 * * MON")
+    /** 매주 일요일 오후 10시 KST (= UTC 13:00) 자동 실행 */
+    @Scheduled(cron = "0 0 13 * * SUN")
     public void run() {
         log.info("[Scheduler] 학식 크롤링 시작");
         CrawlingResult result = menuCrawlerService.crawlAndSave();

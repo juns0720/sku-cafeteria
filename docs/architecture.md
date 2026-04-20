@@ -138,6 +138,7 @@ docker compose --profile full up -d     # PostgreSQL + 백엔드 통합 검증
 
 prod 프로파일 환경변수 (Render 대시보드에서 설정):
 - `SPRING_DATASOURCE_URL` / `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` — Supabase 연결 정보
+  > Render 무료 플랜은 IPv6 미지원. Supabase 직접 연결(포트 5432) 대신 **Connection Pooler — Session 모드**(포트 5432, IPv4)를 사용해야 한다. URL은 `aws-0-xxx.pooler.supabase.com` 형태, username은 `postgres.<project-ref>` 형태.
 - `JWT_SECRET` — Render가 자동 생성(`generateValue`)
 - `CRON_SECRET` — Render가 자동 생성
 - `ALLOWED_ORIGINS` — 쉼표 구분 허용 오리진 (예: `https://sku-cafeteria.vercel.app,http://localhost:5173`)
@@ -154,10 +155,10 @@ prod 프로파일 환경변수 (Render 대시보드에서 설정):
 | V5 | review 3축 nullable 추가 | 적용 |
 | V6 | review 3축 NOT NULL + 기존 rating DROP | 적용 |
 | V7 | reviews.image_url 추가 | 적용 |
-| V8 | menus 집계 캐시 + first/last_seen_at | 예정 P1-T1 |
-| V9 | menu_dates.meal_slot + UNIQUE 재정의 | 예정 P1-T2 |
-| V10 | reviews.photo_urls + users.avatar_color | 예정 P1-T3/T4 |
+| V8 | menus 집계 캐시 + first/last_seen_at | 적용 |
+| V9 | menu_dates.meal_slot + UNIQUE 재정의 | 적용 |
+| V10 | reviews.photo_urls + users.avatar_color | 적용 |
 | V11 | reviews.image_url DROP (롤백 불가) | 예정 P5-T2 |
-| V12 | users.nickname_changed_at | 예정 P2-T12 |
+| V12 | users.nickname_changed_at | 적용 |
 
 스냅샷: V11 직전에 Supabase 프로젝트 백업 필수 (Supabase 대시보드 > Database > Backups).
