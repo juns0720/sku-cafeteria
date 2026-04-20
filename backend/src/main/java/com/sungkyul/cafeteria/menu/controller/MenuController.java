@@ -26,9 +26,10 @@ public class MenuController {
     @GetMapping
     public ResponseEntity<List<MenuResponse>> getMenus(
             @RequestParam(required = false) String sort,
-            @RequestParam(required = false) String corner
+            @RequestParam(required = false) String corner,
+            @RequestParam(defaultValue = "reviewed") String scope
     ) {
-        return ResponseEntity.ok(menuService.getMenus(sort, corner));
+        return ResponseEntity.ok(menuService.getMenus(sort, corner, scope));
     }
 
     @GetMapping("/corners")

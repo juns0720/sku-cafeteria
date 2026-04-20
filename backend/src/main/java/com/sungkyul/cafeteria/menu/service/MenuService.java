@@ -32,9 +32,9 @@ public class MenuService {
     }
 
     @Transactional(readOnly = true)
-    public List<MenuResponse> getMenus(String sort, String corner) {
+    public List<MenuResponse> getMenus(String sort, String corner, String scope) {
         List<MenuResponse> responses = menuRepository.findAggregated(corner).stream()
-                .filter(p -> p.reviewCount() > 0)
+                .filter(p -> "all".equalsIgnoreCase(scope) || p.reviewCount() > 0)
                 .map(p -> toResponse(p, p.latestServedDate()))
                 .collect(Collectors.toCollection(ArrayList::new));
 
