@@ -66,9 +66,10 @@ function AppInner() {
   const { showToast, ToastComponent } = useToast()
   const location = useLocation()
   const navigate = useNavigate()
+  const isHomeRoute = location.pathname === '/'
   const isLoginRoute = location.pathname === '/login'
   const isDevRoute = location.pathname === '/dev/components'
-  const showHeader = !isLoginRoute && (isLoggedIn || isDevRoute)
+  const showHeader = !isLoginRoute && !isHomeRoute && (isLoggedIn || isDevRoute)
   const showBottomNav = !isLoginRoute && !isDevRoute && isLoggedIn
   const isNicknameModalOpen = isLoggedIn && !isLoginRoute && user?.isNicknameSet === false
   const activeTab = getActiveTab(location.pathname)
@@ -143,7 +144,9 @@ function AppInner() {
       {isLoginRoute ? (
         routes
       ) : (
-        <main className="pt-14 pb-24 max-w-[1100px] mx-auto w-full">
+        <main
+          className={`${showHeader ? 'pt-14' : 'pt-0'} pb-24 max-w-[1100px] mx-auto w-full`}
+        >
           {routes}
         </main>
       )}
