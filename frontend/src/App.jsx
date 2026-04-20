@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GoogleOAuthProvider } from '@react-oauth/google'
@@ -25,26 +24,11 @@ function AppInner() {
   const { showToast, ToastComponent } = useToast()
   const location = useLocation()
   const navigate = useNavigate()
-  const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false)
   const isLoginRoute = location.pathname === '/login'
   const isDevRoute = location.pathname === '/dev/components'
   const showHeader = !isLoginRoute && (isLoggedIn || isDevRoute)
   const showBottomNav = !isLoginRoute && isLoggedIn
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      setIsNicknameModalOpen(false)
-      return
-    }
-
-    if (!isLoginRoute && user?.isNicknameSet === false) {
-      setIsNicknameModalOpen(true)
-    }
-
-    if (user?.isNicknameSet) {
-      setIsNicknameModalOpen(false)
-    }
-  }, [isLoggedIn, isLoginRoute, user?.isNicknameSet])
+  const isNicknameModalOpen = isLoggedIn && !isLoginRoute && user?.isNicknameSet === false
 
   const handleLoginSuccess = async (credential) => {
     if (!credential) {
@@ -111,7 +95,7 @@ function AppInner() {
       )}
       {showBottomNav && <BottomNav />}
       {isNicknameModalOpen && (
-        <NicknameSetupModal onClose={() => setIsNicknameModalOpen(false)} />
+        <NicknameSetupModal onClose={() => {}} />
       )}
     </>
   )

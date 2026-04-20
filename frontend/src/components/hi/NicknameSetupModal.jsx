@@ -1,28 +1,44 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createPortal } from 'react-dom'
-import { updateNickname } from '../../api/users'
+import { checkNicknameAvailability, updateNickname } from '../../api/users'
+import {
+  NICKNAME_AVAILABILITY_DELAY_MS,
+  validateNickname,
+} from '../../lib/nickname'
 import Card from './Card'
 import Icon from './Icon'
 import UL from './UL'
 
 const AUTH_ME_QUERY_KEY = ['auth', 'me']
-const NICKNAME_SUGGESTIONS = ['냠냠이', '점심탐정', '학식러버', '오늘은한식', '돈까스킬러']
+const NICKNAME_SUGGESTIONS = [
+  '학식탐험가',
+  '오늘도한끼',
+  '바삭한한입',
+  '급식메이트',
+  '국밥수호대',
+]
+const DEFAULT_HELPER_MESSAGE = '2~12자로 입력해주세요'
+const INITIAL_AVAILABILITY = {
+  status: 'idle',
+  message: '',
+  normalizedNickname: '',
+}
 
-function validateNickname(nickname) {
-  if (!nickname) {
-    return ''
+function toAvailabilityState(response) {
+  if (response.available) {
+    return {
+      status: 'available',
+      message: response.message,
+      normalizedNickname: response.normalizedNickname,
+    }
   }
 
-  if (nickname.length < 2) {
-    return '닉네임은 2자 이상이어야 해요'
+  return {
+    status: response.reason === 'TAKEN' ? 'taken' : 'unavailable',
+    message: response.message,
+    normalizedNickname: response.normalizedNickname,
   }
-
-  if (nickname.length > 12) {
-    return '닉네임은 12자 이하로 입력해주세요'
-  }
-
-  return ''
 }
 
 export default function NicknameSetupModal({ onClose }) {
@@ -31,15 +47,56 @@ export default function NicknameSetupModal({ onClose }) {
   const [nickname, setNickname] = useState('')
   const [submitError, setSubmitError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const normalizedNickname = nickname.trim()
-  const validationMessage = validateNickname(normalizedNickname)
-  const isValid = normalizedNickname.length >= 2 && normalizedNickname.length <= 12
-  const helperMessage = submitError || validationMessage || (isValid ? '형식 확인됨' : '2~12자로 입력해주세요')
-  const helperColor = submitError || validationMessage
-    ? 'text-red'
-    : isValid
-      ? 'text-green'
-      : 'text-mute'
+  const [isComposing, setIsComposing] = useState(false)
+  const [availability, setAvailability] = useState(INITIAL_AVAILABILITY)
+  const [availabilityCache, setAvailabilityCache] = useState(() => new Map())
+
+  const localValidation = validateNickname(nickname)
+  const normalizedNickname = localValidation.normalizedNickname
+  const cachedAvailability = localValidation.isValid
+    ? availabilityCache.get(normalizedNickname)
+    : null
+  const hasCachedAvailability = Boolean(cachedAvailability)
+  const currentAvailability = hasCachedAvailability
+    ? cachedAvailability
+    : availability.normalizedNickname === normalizedNickname
+      ? availability
+      : INITIAL_AVAILABILITY
+  const isCheckingAvailability =
+    Boolean(nickname) &&
+    localValidation.isValid &&
+    !isComposing &&
+    !hasCachedAvailability &&
+    currentAvailability.normalizedNickname !== normalizedNickname
+  const isSubmitDisabled =
+    !localValidation.isValid ||
+    currentAvailability.status !== 'available' ||
+    isSubmitting ||
+    isComposing
+
+  let helperMessage = DEFAULT_HELPER_MESSAGE
+  let helperColor = 'text-mute'
+
+  if (submitError) {
+    helperMessage = submitError
+    helperColor = 'text-red'
+  } else if (nickname && !localValidation.isValid) {
+    helperMessage = localValidation.message
+    helperColor = 'text-red'
+  } else if (isComposing) {
+    helperMessage = '입력이 끝나면 사용 가능 여부를 확인할게요'
+  } else if (isCheckingAvailability) {
+    helperMessage = '사용 가능 여부 확인 중...'
+  } else if (currentAvailability.status === 'available') {
+    helperMessage = currentAvailability.message
+    helperColor = 'text-green'
+  } else if (
+    currentAvailability.status === 'taken' ||
+    currentAvailability.status === 'unavailable'
+  ) {
+    helperMessage = currentAvailability.message
+    helperColor = 'text-red'
+  }
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
@@ -65,6 +122,51 @@ export default function NicknameSetupModal({ onClose }) {
     }
   }, [])
 
+  useEffect(() => {
+    if (!nickname || !localValidation.isValid || isComposing || hasCachedAvailability) {
+      return undefined
+    }
+
+    let isCancelled = false
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await checkNicknameAvailability(normalizedNickname)
+        if (isCancelled) {
+          return
+        }
+
+        const nextAvailability = toAvailabilityState(response)
+        setAvailabilityCache((previousCache) => {
+          const nextCache = new Map(previousCache)
+          nextCache.set(normalizedNickname, nextAvailability)
+          return nextCache
+        })
+        setAvailability(nextAvailability)
+      } catch (error) {
+        if (isCancelled) {
+          return
+        }
+
+        setAvailability({
+          status: 'unavailable',
+          message: error.response?.data?.message ?? '닉네임 확인에 실패했습니다',
+          normalizedNickname,
+        })
+      }
+    }, NICKNAME_AVAILABILITY_DELAY_MS)
+
+    return () => {
+      isCancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [
+    nickname,
+    localValidation.isValid,
+    normalizedNickname,
+    isComposing,
+    hasCachedAvailability,
+  ])
+
   const handleSuggestionClick = (suggestion) => {
     setNickname(suggestion)
     setSubmitError('')
@@ -74,15 +176,18 @@ export default function NicknameSetupModal({ onClose }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    if (!isValid || isSubmitting) {
+    if (isSubmitDisabled) {
       return
     }
 
     setIsSubmitting(true)
     setSubmitError('')
 
+    const confirmedNickname =
+      currentAvailability.normalizedNickname || localValidation.normalizedNickname
+
     try {
-      await updateNickname(normalizedNickname)
+      await updateNickname(confirmedNickname)
       queryClient.setQueryData(AUTH_ME_QUERY_KEY, (previousUser) => {
         if (!previousUser) {
           return previousUser
@@ -90,7 +195,7 @@ export default function NicknameSetupModal({ onClose }) {
 
         return {
           ...previousUser,
-          nickname: normalizedNickname,
+          nickname: confirmedNickname,
           isNicknameSet: true,
         }
       })
@@ -100,7 +205,12 @@ export default function NicknameSetupModal({ onClose }) {
       const status = error.response?.status
       const message = error.response?.data?.message
 
-      if (status === 409 && message?.includes('이미 사용')) {
+      if (status === 409 && message?.includes('이미 사용 중')) {
+        setAvailability({
+          status: 'taken',
+          message: '이미 사용 중인 닉네임입니다',
+          normalizedNickname: confirmedNickname,
+        })
         setSubmitError('이미 사용 중인 닉네임입니다')
       } else {
         setSubmitError(message ?? '닉네임 저장에 실패했습니다')
@@ -128,7 +238,7 @@ export default function NicknameSetupModal({ onClose }) {
             id="nickname-setup-title"
             className="mt-2 font-disp text-[1.9rem] leading-[1.15] text-ink"
           >
-            리뷰에 쓸
+            리뷰에서
             <br />
             <UL>닉네임</UL>을 정해주세요
           </h2>
@@ -144,14 +254,19 @@ export default function NicknameSetupModal({ onClose }) {
                 ref={inputRef}
                 id="nickname-input"
                 value={nickname}
-                maxLength={13}
+                maxLength={24}
                 disabled={isSubmitting}
                 onChange={(event) => {
                   setNickname(event.target.value)
                   setSubmitError('')
                 }}
+                onCompositionStart={() => setIsComposing(true)}
+                onCompositionEnd={(event) => {
+                  setIsComposing(false)
+                  setNickname(event.target.value)
+                }}
                 placeholder="닉네임을 입력하세요"
-                className="min-w-0 flex-1 border-none bg-transparent font-disp text-[1.7rem] leading-none text-ink outline-none placeholder:font-hand placeholder:text-lg placeholder:text-mute"
+                className="min-w-0 flex-1 border-none bg-transparent font-user text-[1.55rem] leading-none text-ink outline-none placeholder:font-hand placeholder:text-lg placeholder:text-mute"
               />
               <span className="mb-[2px] inline-block h-7 w-[2px] animate-pulse rounded-full bg-orange" />
             </div>
@@ -162,7 +277,7 @@ export default function NicknameSetupModal({ onClose }) {
               {helperMessage}
             </p>
             <span className="font-hand text-xs text-inkSoft">
-              {normalizedNickname.length} / 12
+              {localValidation.length} / 12
             </span>
           </div>
 
@@ -188,7 +303,7 @@ export default function NicknameSetupModal({ onClose }) {
                     key={suggestion}
                     type="button"
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className={`rounded-full border-[1.5px] px-3 py-2 font-disp text-sm shadow-card transition-transform active:scale-[0.98] ${
+                    className={`rounded-full border-[1.5px] px-3 py-2 font-user text-sm shadow-card transition-transform active:scale-[0.98] ${
                       isSelected
                         ? 'border-ink bg-yellowSoft text-ink'
                         : 'border-ink bg-white text-ink'
@@ -203,18 +318,18 @@ export default function NicknameSetupModal({ onClose }) {
 
           <button
             type="submit"
-            disabled={!isValid || isSubmitting}
+            disabled={isSubmitDisabled}
             className={`mt-8 flex w-full items-center justify-center gap-2 rounded-[14px] border-[1.8px] border-ink px-5 py-3 font-disp text-base shadow-flat transition-transform ${
-              !isValid || isSubmitting
+              isSubmitDisabled
                 ? 'cursor-not-allowed bg-paperDeep text-mute'
                 : 'bg-ink text-paper active:scale-[0.99]'
             }`}
           >
-            <span>{isSubmitting ? '확인 중...' : '시작하기'}</span>
+            <span>{isSubmitting ? '저장 중...' : '시작하기'}</span>
             <Icon
               name="chevR"
               size={16}
-              color={!isValid || isSubmitting ? '#8E7A66' : '#FBF6EC'}
+              color={isSubmitDisabled ? '#8E7A66' : '#FBF6EC'}
             />
           </button>
         </form>
