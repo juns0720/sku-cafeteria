@@ -34,7 +34,7 @@ public class MenuService {
         LocalDate sunday = monday.plusDays(6);
         return menuRepository.findBestOfWeek(monday, sunday, 3, PageRequest.of(0, 5))
                 .stream()
-                .map(MenuResponse::from)
+                .map(menu -> MenuResponse.from(menu, null, monday))
                 .toList();
     }
 
@@ -45,9 +45,10 @@ public class MenuService {
 
     @Transactional(readOnly = true)
     public List<MenuResponse> getMenus(String sort, String corner, String scope) {
+        LocalDate today = LocalDate.now();
         List<MenuResponse> responses = menuRepository.findAggregated(corner).stream()
                 .filter(p -> "all".equalsIgnoreCase(scope) || p.reviewCount() > 0)
-                .map(p -> toResponse(p, p.latestServedDate()))
+                .map(p -> toResponse(p, p.latestServedDate(), today))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         Comparator<MenuResponse> comparator = switch (sort != null ? sort : "") {
@@ -73,7 +74,7 @@ public class MenuService {
 
         List<MenuResponse> responses = menuDates.stream()
                 .filter(md -> corner == null || corner.isBlank() || Objects.equals(md.getMenu().getCorner(), corner))
-                .map(md -> MenuResponse.from(md.getMenu(), md.getServedDate()))
+                .map(md -> MenuResponse.from(md.getMenu(), md.getServedDate(), today))
                 .toList();
 
         return new TodayMenuResponse(today, responses);
@@ -101,7 +102,7 @@ public class MenuService {
                 default        -> null;
             };
             if (key == null) continue;
-            days.get(key).add(MenuResponse.from(md.getMenu(), md.getServedDate()));
+            days.get(key).add(MenuResponse.from(md.getMenu(), md.getServedDate(), monday));
         }
 
         return new WeeklyMenuResponse(monday, friday, days);
@@ -111,12 +112,11 @@ public class MenuService {
     public MenuResponse getMenuDetail(Long menuId) {
         MenuAggregateProjection proj = menuRepository.findAggregatedById(menuId)
                 .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다"));
-        return toResponse(proj, proj.latestServedDate());
+        return toResponse(proj, proj.latestServedDate(), LocalDate.now());
     }
 
-    private MenuResponse toResponse(MenuAggregateProjection proj, LocalDate servedDate) {
-        boolean isNew = proj.firstSeenAt() != null
-                && !proj.firstSeenAt().isBefore(LocalDate.now().minusDays(7));
+    private MenuResponse toResponse(MenuAggregateProjection proj, LocalDate servedDate, LocalDate referenceDate) {
+        boolean isNew = MenuResponse.isNewForWeek(proj.firstSeenAt(), referenceDate);
         return new MenuResponse(
                 proj.id(),
                 proj.name(),
