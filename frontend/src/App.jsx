@@ -5,10 +5,11 @@ import { createPortal } from 'react-dom'
 import Header from './components/Header'
 import AllMenusPage from './pages/AllMenusPage'
 import HomePage from './pages/HomePage'
-import WeeklyPage from './pages/WeeklyPage'
 import DevComponentsPage from './pages/DevComponentsPage'
 import LoginPage from './pages/LoginPage'
+import MenuDetailPage from './pages/MenuDetailPage'
 import ProfilePage from './pages/ProfilePage'
+import WeeklyPage from './pages/WeeklyPage'
 import NicknameSetupModal from './components/hi/NicknameSetupModal'
 import TabBarHi from './components/hi/TabBarHi'
 import useAuth from './hooks/useAuth'
@@ -69,8 +70,9 @@ function AppInner() {
   const isHomeRoute = location.pathname === '/'
   const isLoginRoute = location.pathname === '/login'
   const isDevRoute = location.pathname === '/dev/components'
-  const showHeader = !isLoginRoute && !isHomeRoute && (isLoggedIn || isDevRoute)
-  const showBottomNav = !isLoginRoute && !isDevRoute && isLoggedIn
+  const isMenuSubRoute = /^\/menus\/[^/]+(?:\/.*)?$/.test(location.pathname)
+  const showHeader = !isLoginRoute && !isHomeRoute && !isMenuSubRoute && (isLoggedIn || isDevRoute)
+  const showBottomNav = !isLoginRoute && !isDevRoute && !isMenuSubRoute && isLoggedIn
   const isNicknameModalOpen = isLoggedIn && !isLoginRoute && user?.isNicknameSet === false
   const activeTab = getActiveTab(location.pathname)
 
@@ -122,6 +124,7 @@ function AppInner() {
       <Route path="/" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" replace />} />
       <Route path="/weekly" element={isLoggedIn ? <WeeklyPage /> : <Navigate to="/login" replace />} />
       <Route path="/menus" element={isLoggedIn ? <AllMenusPage /> : <Navigate to="/login" replace />} />
+      <Route path="/menus/:id" element={isLoggedIn ? <MenuDetailPage /> : <Navigate to="/login" replace />} />
       <Route path="/reviews" element={<Navigate to={isLoggedIn ? '/menus' : '/login'} replace />} />
       <Route path="/profile" element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" replace />} />
       <Route path="/my-reviews" element={<Navigate to="/profile" replace />} />
@@ -145,7 +148,7 @@ function AppInner() {
         routes
       ) : (
         <main
-          className={`${showHeader ? 'pt-14' : 'pt-0'} pb-24 max-w-[1100px] mx-auto w-full`}
+          className={`${showHeader ? 'pt-14' : 'pt-0'} ${showBottomNav ? 'pb-24' : 'pb-0'} max-w-[1100px] mx-auto w-full`}
         >
           {routes}
         </main>

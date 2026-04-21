@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { getBestMenus, getTodayMenus } from '../api/menus'
 import BestCarousel from '../components/hi/BestCarousel'
 import Card from '../components/hi/Card'
@@ -129,7 +130,7 @@ function HomeSectionSkeleton() {
   )
 }
 
-function CornerGroupCard({ corner, items }) {
+function CornerGroupCard({ corner, items, onMenuSelect }) {
   return (
     <Card bg="#FFFFFF" style={{ padding: '16px 16px 14px', borderRadius: 24 }}>
       <div className="flex items-center justify-between gap-3">
@@ -141,9 +142,11 @@ function CornerGroupCard({ corner, items }) {
 
       <div className="mt-3 flex flex-col">
         {items.map((menu, index) => (
-          <div
+          <button
             key={menu.id}
-            className={`flex items-start justify-between gap-3 py-3 ${
+            type="button"
+            onClick={() => onMenuSelect(menu.id)}
+            className={`flex items-start justify-between gap-3 py-3 text-left transition-transform active:scale-[0.99] ${
               index > 0 ? 'border-t border-dashed border-rule' : ''
             }`}
           >
@@ -191,7 +194,7 @@ function CornerGroupCard({ corner, items }) {
                 </div>
               )}
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </Card>
@@ -199,6 +202,7 @@ function CornerGroupCard({ corner, items }) {
 }
 
 export default function HomePage() {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [sort, setSort] = useState('rating')
   const {
@@ -218,6 +222,7 @@ export default function HomePage() {
   const groupedMenus = groupMenusByCorner(sortedMenus)
   const dateLabel = getTodayLabel(todayData?.date)
   const shouldShowBest = !isBestLoading && bestMenus.length > 0
+  const handleMenuSelect = (menuId) => navigate(`/menus/${menuId}`)
 
   return (
     <div className="animate-fadeInUp">
@@ -252,6 +257,7 @@ export default function HomePage() {
                   key={group.corner}
                   corner={group.corner}
                   items={group.items}
+                  onMenuSelect={handleMenuSelect}
                 />
               ))}
             </div>
@@ -269,7 +275,10 @@ export default function HomePage() {
             >
               🏆 이번 주 BEST
             </SecLabel>
-            <BestCarousel items={bestMenus.slice(0, 5)} />
+            <BestCarousel
+              items={bestMenus.slice(0, 5)}
+              onItemClick={(menu) => handleMenuSelect(menu.id)}
+            />
           </section>
         )}
       </div>

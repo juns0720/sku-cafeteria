@@ -1,5 +1,6 @@
 import { useDeferredValue, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { getAllMenus, getCorners } from '../api/menus'
 import Card from '../components/hi/Card'
 import CornerFilterChips from '../components/hi/CornerFilterChips'
@@ -106,13 +107,17 @@ function AllMenusSkeleton() {
   )
 }
 
-function MenuRow({ menu, isLast }) {
+function MenuRow({ menu, isLast, onSelect }) {
   const rating = menu.avgOverall ?? menu.averageRating
   const reviewCount = menu.reviewCount ?? 0
   const hasRating = rating != null && reviewCount > 0
 
   return (
-    <div className={`flex items-center gap-3 py-3 ${isLast ? '' : 'border-b border-dashed border-rule'}`}>
+    <button
+      type="button"
+      onClick={() => onSelect(menu.id)}
+      className={`flex w-full items-center gap-3 py-3 text-left transition-transform active:scale-[0.99] ${isLast ? '' : 'border-b border-dashed border-rule'}`}
+    >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <MedalSticker tier={menu.tier} size={20} />
@@ -151,11 +156,13 @@ function MenuRow({ menu, isLast }) {
           )}
         </div>
       </div>
-    </div>
+      <Icon name="chevR" size={18} color="#8E7A66" stroke={2} />
+    </button>
   )
 }
 
 export default function AllMenusPage() {
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [activeCorner, setActiveCorner] = useState('전체')
   const [sort, setSort] = useState('rating')
@@ -180,6 +187,7 @@ export default function AllMenusPage() {
   const resultLabel = deferredQuery.trim()
     ? `${filteredMenus.length}개 결과`
     : `${menus.length}개 메뉴`
+  const handleMenuSelect = (menuId) => navigate(`/menus/${menuId}`)
 
   if (isMenusLoading) {
     return <AllMenusSkeleton />
@@ -227,6 +235,7 @@ export default function AllMenusPage() {
                   key={menu.id}
                   menu={menu}
                   isLast={index === filteredMenus.length - 1}
+                  onSelect={handleMenuSelect}
                 />
               ))}
             </Card>

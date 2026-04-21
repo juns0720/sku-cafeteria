@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { getWeeklyMenus } from '../api/menus'
 import Card from '../components/hi/Card'
 import EmptyState from '../components/hi/EmptyState'
@@ -154,7 +155,7 @@ function WeeklyPageSkeleton() {
   )
 }
 
-function WeeklyMenuRow({ menu }) {
+function WeeklyMenuRow({ menu, onSelect }) {
   const illust = getIllustrationProps(menu.corner)
   const hasRating = menu.avgOverall != null && (menu.reviewCount ?? 0) > 0
   const emptyReviewCopy = menu.isNew
@@ -162,8 +163,12 @@ function WeeklyMenuRow({ menu }) {
     : '첫 리뷰의 주인공이 되어보세요'
 
   return (
-    <Card bg="#FFFFFF" style={{ padding: '12px', borderRadius: 24 }}>
-      <div className="flex items-center gap-3">
+    <Card bg="#FFFFFF" style={{ borderRadius: 24 }}>
+      <button
+        type="button"
+        onClick={() => onSelect(menu.id)}
+        className="flex w-full items-center gap-3 p-3 text-left transition-transform active:scale-[0.99]"
+      >
         <FoodIllust kind={illust.kind} size={50} bg={illust.bg} />
 
         <div className="min-w-0 flex-1">
@@ -202,12 +207,13 @@ function WeeklyMenuRow({ menu }) {
         <div className="shrink-0 self-start pt-1">
           <MedalSticker tier={menu.tier} size={26} />
         </div>
-      </div>
+      </button>
     </Card>
   )
 }
 
 export default function WeeklyPage() {
+  const navigate = useNavigate()
   const [selectedDayKey, setSelectedDayKey] = useState(getTodayWeekKey)
   const dateKey = getTodayDateKey()
   const {
@@ -230,6 +236,7 @@ export default function WeeklyPage() {
   const weekRangeLabel = data?.weekStart && data?.weekEnd
     ? `${formatMonthDay(data.weekStart)} - ${formatMonthDay(data.weekEnd)}`
     : ''
+  const handleMenuSelect = (menuId) => navigate(`/menus/${menuId}`)
 
   if (isLoading) {
     return <WeeklyPageSkeleton />
@@ -294,7 +301,11 @@ export default function WeeklyPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {selectedMenus.map((menu) => (
-                <WeeklyMenuRow key={`${activeDay.key}-${menu.id}`} menu={menu} />
+                <WeeklyMenuRow
+                  key={`${activeDay.key}-${menu.id}`}
+                  menu={menu}
+                  onSelect={handleMenuSelect}
+                />
               ))}
             </div>
           )}
