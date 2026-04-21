@@ -89,7 +89,7 @@
 - [x] **P4-T7**: `AllMenusPage` (`/menus`, FE-C-5 흡수) — 검색/코너 필터/정렬/MedalSticker 리스트
 - [x] **P4-T8**: `MenuDetailPage` (`/menus/:id`, FE-C-6 흡수) — 모달 → 풀스크린 라우트, 3축 집계 + 리뷰 리스트
 - [x] **P4-T9**: `ReviewWritePage` (`/menus/:id/review`) — `MultiStarRating` 3축 + 한 마디
-- [ ] **P4-T10**: `EmptyState` 흐름 — 오늘 메뉴 0건 시 빈 상태 + 지난 주 베스트 미리보기
+- [x] **P4-T10**: `EmptyState` 흐름 — 오늘 메뉴 0건 시 빈 상태 + 지난 주 베스트 미리보기
 
 > **Phase 4 게이트**: 4탭 전부 새 디자인 + `npm run build` + 375/768/1280 수동 → Phase 5.
 
