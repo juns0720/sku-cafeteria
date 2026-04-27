@@ -34,7 +34,7 @@
 - [x] **V3-T7**: `LoginPage` (`/login`) — 카테고리 일러스트 컬러 유지 (예외)
 - [x] **V3-T8**: `NicknameSetupModal` (App 조건부) — 닫기 불가, 추천 칩 5개, 가용성 체크
 - [x] **V3-T9**: `HomePage` (`/`) — `BestRow` + 오늘 메뉴 코너별 리스트
-- [ ] **V3-T10**: `WeeklyPage` (`/weekly`) — `WeekPicker` + 요일별 코너 리스트
+- [x] **V3-T10**: `WeeklyPage` (`/weekly`) — `WeekPicker` + 요일별 코너 리스트
 - [ ] **V3-T11**: `AllMenusPage` (`/menus`) — 검색 + `CategoryFilter` + 정렬 + `MedalDot`
 - [ ] **V3-T12**: `MenuDetailPage` (`/menus/:id`) — 모달→풀스크린, 3축 `AxisProgress` + 리뷰 리스트
 - [ ] **V3-T13**: `ReviewWritePage` (`/menus/:id/review`) — `MultiStarInput` 3축 + textarea
