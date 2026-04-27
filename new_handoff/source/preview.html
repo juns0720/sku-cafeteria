@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SKU 학식 — Coral Final</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #F2F4F6; overflow: hidden; }
+  body { font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif; color: #191F28; }
+  .design-canvas { cursor: grab; }
+  * { box-sizing: border-box; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="coral-system.jsx"></script>
+<script type="text/babel" src="coral-home.jsx"></script>
+<script type="text/babel" src="coral-week-all.jsx"></script>
+<script type="text/babel" src="coral-detail-write.jsx"></script>
+<script type="text/babel" src="coral-profile-onboarding.jsx"></script>
+
+<script type="text/babel">
+function App() {
+  return (
+    <DesignCanvas>
+      <div style={{ padding: '24px 60px 16px', maxWidth: 1100 }}>
+        <div style={{
+          fontSize: 38, fontWeight: 800, color: '#191F28',
+          letterSpacing: -1.2, lineHeight: 1.1,
+        }}>
+          SKU 학식 <span style={{ color: '#FF6B5C' }}>Coral</span>
+        </div>
+        <div style={{
+          fontSize: 15, color: '#6B7684', marginTop: 6, lineHeight: 1.5, fontWeight: 500,
+        }}>
+          최종 시안 · 9개 화면 · 모바일 뷰포트 375 × 760<br />
+          <span style={{ color: '#8B95A1', fontSize: 13 }}>두 손가락 스크롤/드래그로 이동, 핀치로 확대</span>
+        </div>
+      </div>
+
+      <DCSection
+        title="① 메인"
+        subtitle="홈 · 오늘의 베스트 5 + 운영 중 리스트"
+        gap={48}>
+        <CoralHome />
+      </DCSection>
+
+      <DCSection
+        title="② 탐색"
+        subtitle="주간 식단 · 전체 메뉴"
+        gap={48}>
+        <CoralWeek />
+        <CoralAll />
+      </DCSection>
+
+      <DCSection
+        title="③ 메뉴 & 리뷰"
+        subtitle="메뉴 상세 · 리뷰 작성"
+        gap={48}>
+        <CoralDetail />
+        <CoralWrite />
+      </DCSection>
+
+
+
+      <DCSection
+        title="④ 프로필"
+        subtitle="유저 정보 · 진행도 · 통계 · 내 리뷰"
+        gap={48}>
+        <CoralProfile />
+      </DCSection>
+
+      <DCSection
+        title="⑤ 온보딩 & 빈 상태"
+        subtitle="로그인 · 닉네임 · 빈 상태"
+        gap={48}>
+        <CoralLogin />
+        <CoralNickname />
+        <CoralEmpty />
+      </DCSection>
+
+      <div style={{ padding: '20px 60px 60px', maxWidth: 1100 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#191F28', marginBottom: 14, letterSpacing: -0.5 }}>
+          디자인 시스템
+        </div>
+
+        {/* Color */}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
+          {[
+            { n: 'Coral', c: '#FF6B5C', label: '액센트' },
+            { n: 'Coral Soft', c: '#FFEEEC', label: 'NEW 뱃지 배경' },
+            { n: 'Ink', c: '#191F28', label: '본문' },
+            { n: 'Gray 700', c: '#4E5968', label: '서브 텍스트' },
+            { n: 'Gray 500', c: '#8B95A1', label: '메타' },
+            { n: 'Gray 100', c: '#F2F4F6', label: '썸네일/배경' },
+            { n: 'Gray 50', c: '#F9FAFB', label: '카드 배경' },
+            { n: 'White', c: '#FFFFFF', label: '베이스' },
+          ].map(s => (
+            <div key={s.n} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '10px 14px', background: '#fff',
+              border: '1px solid #E5E8EB', borderRadius: 10,
+              fontSize: 13, fontWeight: 500,
+            }}>
+              <div style={{
+                width: 22, height: 22, borderRadius: 6, background: s.c,
+                border: '1px solid #E5E8EB',
+              }} />
+              <div>
+                <div style={{ fontWeight: 700, color: '#191F28', letterSpacing: -0.2 }}>{s.n}</div>
+                <div style={{ fontSize: 11, color: '#8B95A1', fontFamily: 'ui-monospace, monospace' }}>{s.c}</div>
+              </div>
+              <span style={{ fontSize: 11, color: '#8B95A1', marginLeft: 4 }}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Tokens */}
+        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', fontSize: 13, color: '#4E5968', lineHeight: 1.5 }}>
+          <div>
+            <div style={{ fontSize: 11, color: '#8B95A1', fontWeight: 700, letterSpacing: 0.5, marginBottom: 4 }}>TYPOGRAPHY</div>
+            <div>Pretendard · 800 / 700 / 600 / 500</div>
+            <div>Display 22-26px · Title 17-18px · Body 14-15px · Meta 11-13px</div>
+            <div>Letter-spacing -0.3 ~ -0.7 (제목)</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, color: '#8B95A1', fontWeight: 700, letterSpacing: 0.5, marginBottom: 4 }}>RADIUS</div>
+            <div>4 · 12 · 14 · 16 · 18 · 999 (pill)</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, color: '#8B95A1', fontWeight: 700, letterSpacing: 0.5, marginBottom: 4 }}>SPACING</div>
+            <div>화면 좌우 패딩 24 · 카드 14-16 · 섹션 간격 18-22</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, color: '#8B95A1', fontWeight: 700, letterSpacing: 0.5, marginBottom: 4 }}>ICONS</div>
+            <div>SVG 1.5-1.7 stroke · 모든 음식 아이콘 g500 단색</div>
+          </div>
+        </div>
+      </div>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

@@ -28,9 +28,11 @@
 
 ### Step 4. 다음 단위의 Phase 파일 선택적 읽기
 
-- `99-progress.md`에서 다음 단위 ID (예: BE-A-3a) 확인
+- `99-progress.md`에서 다음 단위 ID (예: V3-T19, PD-T1) 확인
 - 해당 단위가 속한 `NN-phase-*.md`에서 **해당 단위 섹션만** 정독
   - SQL 마이그레이션, 파일 경로, 검증 기준 숙지
+
+> Coral Redesign(v3)은 BE 변경이 거의 없다 — Phase v3-3의 V3-T19(reviews.image_url DROP)와 Phase D(Cloudinary)가 BE 작업. 그 외 단위는 모두 FE 전용.
 
 ### Step 5. 참조 문서 (필요 시)
 
@@ -58,7 +60,7 @@
 - [x] 완료 단위 ID 나열 (최근 5개 정도)
 
 ### 다음 작업
-- **다음 단위 ID**: (예: BE-A-3a)
+- **다음 단위 ID**: (예: V3-T19, PD-T1)
 - **작업 파일**: (해당 Phase md 링크)
 - **요지**: (1~2줄 요약)
 - **선행 의존성**: (있으면)

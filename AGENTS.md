@@ -7,7 +7,7 @@ For Claude Code users, see CLAUDE.md (auto-loads docs context via @import).
 
 성결대학교 학식 리뷰 풀스택 앱.
 - **Backend**: Spring Boot 3.5 / Java 17 / Gradle 8.14 / PostgreSQL
-- **Frontend**: React 19 / Vite / TailwindCSS v3 / React Query v5 / Google Fonts(Gaegu, Jua)
+- **Frontend**: React 19 / Vite / TailwindCSS v3 / React Query v5 / Pretendard CDN
 - **Deployment**: Render (backend `https://sku-cafeteria-backend.onrender.com`), Supabase (PostgreSQL), Vercel (frontend)
 - **Auth**: Google OAuth2 idToken → JWT (`Authorization: Bearer`)
 
@@ -43,7 +43,7 @@ npm run lint
 - [Architecture](docs/architecture.md) — 패키지 구조, Auth Flow, Security, Docker, 환경변수
 - [API Reference](docs/api.md) — 전체 엔드포인트, 에러 형식, Exception → HTTP 매핑
 - [Conventions](docs/conventions.md) — 레이어 구조, 도메인 규칙, 엔티티 수정 패턴
-- [Frontend Design System v2](docs/DESIGN.md) — 컬러·타이포·컴포넌트 카탈로그
+- [Frontend Design System v3 Coral](docs/DESIGN.md) — 컬러·타이포·컴포넌트 카탈로그
 
 ## Session Start
 
@@ -54,9 +54,9 @@ npm run lint
 
 ## Development Rules
 
-- 한 번에 하나의 단위(P3-T2 등)만 구현. 커밋 메시지에 ID 포함
-- 단위 완료 시 `docs/plans/ui-ux-redesign/99-progress.md` 체크박스만 갱신
-- 신규 v2 컴포넌트는 `frontend/src/components/hi/` 하위 (기존 `components/`는 v1)
+- 한 번에 하나의 단위(V3-T2 등)만 구현. 커밋 메시지에 ID 포함
+- 단위 완료 시 `docs/plans/coral-redesign/99-progress.md` 체크박스만 갱신
+- 신규 v3 Coral 컴포넌트는 `frontend/src/components/coral/` 하위 (`components/hi/`는 v2, `components/`는 v1 — Phase v3-3에서 일괄 삭제)
 - `position: fixed` UI는 `createPortal(…, document.body)` 사용
 - FE 검증: 375 / 768 / 1280 뷰포트 — 컴포넌트 단위는 `/dev/components` 카탈로그로
 - `git commit` / `git push`는 사용자가 직접

@@ -39,7 +39,8 @@
 }
 
 body {
-  font-family: var(--font-hand);
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont,
+               'Apple SD Gothic Neo', system-ui, sans-serif;
   background: var(--paper);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;

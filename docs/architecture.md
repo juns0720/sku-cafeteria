@@ -113,7 +113,7 @@ public void create(...) {
 }
 ```
 
-자세한 구현은 [Phase 2 P2-T4](./plans/ui-ux-redesign/02-phase-2-backend.md) 참조.
+자세한 구현은 [v2 archive Phase 2 P2-T4](./plans/archive/ui-ux-redesign-v2/02-phase-2-backend.md) 참조 (BE는 v2에서 완료, v3 Coral은 FE 전용).
 
 ## Docker / 로컬 개발
 
