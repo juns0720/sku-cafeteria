@@ -3,6 +3,7 @@ package com.sungkyul.cafeteria.menu.dto;
 import com.sungkyul.cafeteria.menu.domain.MenuTier;
 import com.sungkyul.cafeteria.menu.entity.Menu;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 public record MenuResponse(
@@ -22,9 +23,8 @@ public record MenuResponse(
         Double avgValue,
         Double avgOverall
 ) {
-    public static MenuResponse from(Menu m, LocalDate servedDate) {
-        boolean isNew = m.getFirstSeenAt() != null
-                && !m.getFirstSeenAt().isBefore(LocalDate.now().minusDays(7));
+    public static MenuResponse from(Menu m, LocalDate servedDate, LocalDate referenceDate) {
+        boolean isNew = isNewForWeek(m.getFirstSeenAt(), referenceDate);
         return new MenuResponse(
                 m.getId(), m.getName(), m.getCorner(),
                 servedDate,
@@ -35,7 +35,23 @@ public record MenuResponse(
         );
     }
 
+    public static MenuResponse from(Menu m, LocalDate servedDate) {
+        return from(m, servedDate, LocalDate.now());
+    }
+
     public static MenuResponse from(Menu m) {
         return from(m, null);
+    }
+
+    public static boolean isNewForWeek(LocalDate firstSeenAt, LocalDate referenceDate) {
+        if (firstSeenAt == null) {
+            return false;
+        }
+
+        LocalDate baseDate = referenceDate != null ? referenceDate : LocalDate.now();
+        LocalDate weekStart = baseDate.with(DayOfWeek.MONDAY);
+        LocalDate weekEnd = weekStart.plusDays(6);
+
+        return !firstSeenAt.isBefore(weekStart) && !firstSeenAt.isAfter(weekEnd);
     }
 }

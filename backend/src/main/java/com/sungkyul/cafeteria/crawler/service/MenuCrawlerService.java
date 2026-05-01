@@ -94,8 +94,14 @@ public class MenuCrawlerService {
 
                         // (name, corner) 기준으로 upsert — 메뉴 자체는 한 번만 저장
                         Menu menu = menuRepository.findByNameAndCorner(menuName, corner)
+                                .map(existingMenu -> syncMenuSeenDates(existingMenu, servedDate))
                                 .orElseGet(() -> menuRepository.save(
-                                        Menu.builder().name(menuName).corner(corner).build()
+                                        Menu.builder()
+                                                .name(menuName)
+                                                .corner(corner)
+                                                .firstSeenAt(servedDate)
+                                                .lastSeenAt(servedDate)
+                                                .build()
                                 ));
 
                         // 해당 주차 제공일 기록 — 이미 있으면 skip
@@ -118,6 +124,13 @@ public class MenuCrawlerService {
             log.error("[Crawler] 크롤링 중 오류 발생: {}", e.getMessage(), e);
             return CrawlingResult.failure(e.getMessage());
         }
+    }
+
+    private Menu syncMenuSeenDates(Menu menu, LocalDate servedDate) {
+        if (menu.syncSeenDates(servedDate)) {
+            return menuRepository.save(menu);
+        }
+        return menu;
     }
 
     public String debugHtml() {

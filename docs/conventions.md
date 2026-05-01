@@ -18,15 +18,15 @@
 - 정규화 2-테이블: `menus(name, corner)` + `menu_dates(menu_id, served_date, meal_slot)`
   - `menus` UNIQUE: `(name, corner)`
   - `menu_dates` UNIQUE: `(menu_id, served_date, meal_slot)`
-- `corner`는 DB에 VARCHAR로 저장하되 응답 직렬화 시 `CornerMapper.fromString()`로 enum(`KOREAN/WESTERN/SNACK/SPECIAL`) 변환. **미매칭은 KOREAN fallback + WARN 로그** ([D4](./plans/ui-ux-redesign/00-overview.md))
+- `corner`: DB는 raw String VARCHAR 유지, Java도 raw String 그대로 사용. corner→일러스트 매핑은 FE의 `coral/Thumb` 컴포넌트 안에서 정적 매핑 테이블로 처리(미매칭은 기본 아이콘 fallback). 코너 enum 매핑 없음
 - `meal_slot`: 기본 `LUNCH`. DINNER는 후속 (현재 식단표가 점심만)
-- `firstSeenAt`/`lastSeenAt`은 컬럼화. NEW 윈도우 = `firstSeenAt + 7일` ([D2](./plans/ui-ux-redesign/00-overview.md))
+- `firstSeenAt`/`lastSeenAt`은 컬럼화. NEW 윈도우 = `firstSeenAt + 7일` ([archive D2](./plans/archive/ui-ux-redesign-v2/00-overview.md))
 
 ### 사용자
-- **닉네임**: 2~12자, UNIQUE. **30일 쿨다운** ([D6](./plans/ui-ux-redesign/00-overview.md)) — `users.nickname_changed_at`. 미경과 시 409 with `nextChangeAt`
+- **닉네임**: 2~12자, UNIQUE. **30일 쿨다운** ([archive D6](./plans/archive/ui-ux-redesign-v2/00-overview.md)) — `users.nickname_changed_at`. 미경과 시 409 with `nextChangeAt`
 - `is_nickname_set=true`이면 Google 재로그인 시 nickname 덮어쓰지 않음
 - `avatar_color VARCHAR(7) NOT NULL DEFAULT '#EF8A3D'`
-- BadgeTier 임계값 (`BadgeTier.of(reviewCount)`): NONE(0) / 🥉 BRONZE(1~4) / 🥈 SILVER(5~29) / 🥇 GOLD(30+) ([D1](./plans/ui-ux-redesign/00-overview.md))
+- BadgeTier 임계값 (`BadgeTier.of(reviewCount)`): NONE(0) / 🥉 BRONZE(1~4) / 🥈 SILVER(5~29) / 🥇 GOLD(30+) ([archive D1](./plans/archive/ui-ux-redesign-v2/00-overview.md))
 
 ### 메뉴 메달 (`MenuTier.of(avgOverall, reviewCount)`)
 | 메달 | 평균 | 리뷰 수 |
@@ -71,7 +71,7 @@ DB 컬럼 변경은 3단계 무중단 패턴을 따른다:
 2. **Migrate**: BE 응답에 신규 필드 노출(기존 필드 유지) → FE 전환
 3. **Contract**: FE 전환 완료 후 BE에서 기존 컬럼 DROP
 
-예: `image_url` → `photo_urls` 전환 ([D7](./plans/ui-ux-redesign/00-overview.md))
+예: `image_url` → `photo_urls` 전환 ([archive D7](./plans/archive/ui-ux-redesign-v2/00-overview.md))
 - V10에서 `photo_urls TEXT[]` 추가 + 백필
 - BE는 `imageUrl` 입력을 `photoUrls`로 wrap (호환), 응답에 둘 다 노출
 - FE가 `photoUrls`만 사용하도록 전환
@@ -79,13 +79,13 @@ DB 컬럼 변경은 3단계 무중단 패턴을 따른다:
 
 ## 프론트 컴포넌트 디렉토리
 
-- 신규 v2 컴포넌트는 **`frontend/src/components/hi/`** 하위에 둔다
-- 기존 `frontend/src/components/`는 v1 — 한 페이지씩 새 컴포넌트로 교체 후 [P5-T1](./plans/ui-ux-redesign/05-phase-5-cleanup.md)에서 일괄 삭제
+- 신규 v3 Coral 컴포넌트는 **`frontend/src/components/coral/`** 하위에 둔다
+- `frontend/src/components/hi/`는 v2(종이/잉크 톤), `frontend/src/components/`는 v1 — Phase v3-3 [`V3-T17`](./plans/coral-redesign/03-phase-3-cleanup.md) / [`V3-T18`](./plans/coral-redesign/03-phase-3-cleanup.md)에서 일괄 삭제
 - `position: fixed` UI(모달 등)는 `createPortal(…, document.body)` 사용 — transform 조상의 stacking context 우회
 
 ## 작업 단위 / 커밋
 
-- 한 번에 하나의 단위(예: P2-T7)만 구현하고 단위 ID를 커밋 메시지에 포함: `feat(P2-T7): GET /menus/best`
-- 단위 완료 시 [`docs/plans/ui-ux-redesign/99-progress.md`](./plans/ui-ux-redesign/99-progress.md)의 체크박스 업데이트
+- 한 번에 하나의 단위(예: V3-T9)만 구현하고 단위 ID를 커밋 메시지에 포함: `feat(V3-T9): rewrite HomePage with coral`
+- 단위 완료 시 [`docs/plans/coral-redesign/99-progress.md`](./plans/coral-redesign/99-progress.md)의 체크박스 업데이트
 - BE는 단위 테스트 + Postman 스모크, FE는 375 / 768 / 1280 뷰포트 시각 확인
 - `git commit` / `git push`는 사용자가 직접 (Claude는 커밋하지 않음)

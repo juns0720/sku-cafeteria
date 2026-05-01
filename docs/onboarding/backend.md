@@ -1,6 +1,6 @@
-# Skill: project-review
+# Backend Session Onboarding Checklist
 
-새로운 Claude Code 세션이 시작될 때 프로젝트 전체를 빠르게 파악하기 위한 Skill (백엔드 세션 공통).
+새 세션 시작 시 프로젝트 전체를 빠르게 파악하기 위한 체크리스트 (백엔드 세션 공통).
 
 ## 목적
 
@@ -28,9 +28,11 @@
 
 ### Step 4. 다음 단위의 Phase 파일 선택적 읽기
 
-- `99-progress.md`에서 다음 단위 ID (예: BE-A-3a) 확인
+- `99-progress.md`에서 다음 단위 ID (예: V3-T19, PD-T1) 확인
 - 해당 단위가 속한 `NN-phase-*.md`에서 **해당 단위 섹션만** 정독
   - SQL 마이그레이션, 파일 경로, 검증 기준 숙지
+
+> Coral Redesign(v3)은 BE 변경이 거의 없다 — Phase v3-3의 V3-T19(reviews.image_url DROP)와 Phase D(Cloudinary)가 BE 작업. 그 외 단위는 모두 FE 전용.
 
 ### Step 5. 참조 문서 (필요 시)
 
@@ -58,7 +60,7 @@
 - [x] 완료 단위 ID 나열 (최근 5개 정도)
 
 ### 다음 작업
-- **다음 단위 ID**: (예: BE-A-3a)
+- **다음 단위 ID**: (예: V3-T19, PD-T1)
 - **작업 파일**: (해당 Phase md 링크)
 - **요지**: (1~2줄 요약)
 - **선행 의존성**: (있으면)
@@ -71,6 +73,5 @@
 ## 주의사항
 
 - `docs/plans/` 외부의 과거 플랜 파일은 존재하지 않음 (삭제되었음)
-- `~/.claude/plans/` 사설 디렉토리는 **참조하지 말 것** — 모든 컨텍스트는 `docs/plans/`에 있음
 - 구현 완료 후 **`docs/plans/<feature>/99-progress.md`만** 체크박스 갱신 (중복 갱신 X)
-- `git commit` / `git push`는 사용자가 직접 진행 — Claude는 커밋하지 않음
+- `git commit` / `git push`는 사용자가 직접 진행 — AI는 커밋하지 않음

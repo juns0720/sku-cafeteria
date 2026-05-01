@@ -115,6 +115,10 @@ class MenuCrawlerServiceTest {
                 .allMatch(c -> c.equals("한식") || c.equals("양식"));
         assertThat(menuCaptor.getAllValues()).extracting(Menu::getName)
                 .doesNotContain("등록된 식단내용이(가) 없습니다.");
+        assertThat(menuCaptor.getAllValues()).extracting(Menu::getFirstSeenAt)
+                .doesNotContainNull();
+        assertThat(menuCaptor.getAllValues()).extracting(Menu::getLastSeenAt)
+                .doesNotContainNull();
     }
 
     @Test
@@ -138,6 +142,73 @@ class MenuCrawlerServiceTest {
         assertThat(result.errorMessage()).isNull();
         assertThat(result.savedCount()).isEqualTo(6);
         assertThat(result.skippedCount()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("중복 menu_date 여도 seen date 메타가 비어 있으면 보정")
+    void crawlAndSave_duplicateDate_repairsNullSeenDates() throws Exception {
+        String html = """
+                <html><body>
+                <table>
+                  <thead><tr><th class="title">식단구분</th><th>월<br>2026.04.13</th></tr></thead>
+                  <tbody><tr><td>한식</td><td>된장찌개</td></tr></tbody>
+                </table>
+                </body></html>
+                """;
+        Document doc = Jsoup.parse(html);
+        doReturn(doc).when(crawlerService).fetchDocument();
+
+        Menu existingMenu = Menu.builder().name("된장찌개").corner("한식").build();
+        when(menuRepository.findByNameAndCorner("된장찌개", "한식"))
+                .thenReturn(Optional.of(existingMenu));
+        when(menuDateRepository.existsByMenuAndServedDate(existingMenu, LocalDate.of(2026, 4, 13)))
+                .thenReturn(true);
+
+        CrawlingResult result = crawlerService.crawlAndSave();
+
+        assertThat(result.savedCount()).isZero();
+        assertThat(result.skippedCount()).isEqualTo(1);
+        assertThat(existingMenu.getFirstSeenAt()).isEqualTo(LocalDate.of(2026, 4, 13));
+        assertThat(existingMenu.getLastSeenAt()).isEqualTo(LocalDate.of(2026, 4, 13));
+        verify(menuRepository).save(existingMenu);
+    }
+
+    @Test
+    @DisplayName("기존 메뉴가 더 늦은 날짜에 다시 등장하면 lastSeenAt 을 갱신")
+    void crawlAndSave_existingMenu_updatesLastSeenAt() throws Exception {
+        String html = """
+                <html><body>
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="title">식단구분</th>
+                      <th>월<br>2026.04.13</th>
+                      <th>화<br>2026.04.14</th>
+                    </tr>
+                  </thead>
+                  <tbody><tr><td>한식</td><td>된장찌개</td><td>된장찌개</td></tr></tbody>
+                </table>
+                </body></html>
+                """;
+        Document doc = Jsoup.parse(html);
+        doReturn(doc).when(crawlerService).fetchDocument();
+
+        Menu existingMenu = Menu.builder()
+                .name("된장찌개")
+                .corner("한식")
+                .firstSeenAt(LocalDate.of(2026, 4, 10))
+                .lastSeenAt(LocalDate.of(2026, 4, 10))
+                .build();
+        when(menuRepository.findByNameAndCorner("된장찌개", "한식"))
+                .thenReturn(Optional.of(existingMenu));
+
+        CrawlingResult result = crawlerService.crawlAndSave();
+
+        assertThat(result.savedCount()).isEqualTo(2);
+        assertThat(result.skippedCount()).isZero();
+        assertThat(existingMenu.getFirstSeenAt()).isEqualTo(LocalDate.of(2026, 4, 10));
+        assertThat(existingMenu.getLastSeenAt()).isEqualTo(LocalDate.of(2026, 4, 14));
+        verify(menuRepository, times(2)).save(existingMenu);
     }
 
     @Test

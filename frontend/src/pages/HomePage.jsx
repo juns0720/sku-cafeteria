@@ -1,43 +1,204 @@
 import { useState } from 'react'
-import MenuCard from '../components/MenuCard'
-import MenuDetailModal from '../components/MenuDetailModal'
-import useAuth from '../hooks/useAuth'
-
-const MOCK_TODAY = [
-  { menuId: 1, name: '제육볶음', corner: 'A코너', averageRating: 4.2, reviewCount: 12 },
-  { menuId: 2, name: '된장찌개', corner: 'B코너', averageRating: 3.8, reviewCount: 5 },
-  { menuId: 3, name: '돈까스', corner: 'A코너', averageRating: 4.5, reviewCount: 20 },
-  { menuId: 4, name: '비빔밥', corner: 'C코너', averageRating: null, reviewCount: 0 },
-]
+import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import { getBestMenus, getTodayMenus } from '../api/menus'
+import BestRow from '../components/coral/BestRow'
+import Empty from '../components/coral/Empty'
+import Icon from '../components/coral/Icon'
+import Thumb from '../components/coral/Thumb'
 
 const DAY_KO = ['일', '월', '화', '수', '목', '금', '토']
+const TODAY_SLOT = 'LUNCH'
+const SORT_LABELS = { rating: '별점순', name: '가나다순', reviewCount: '리뷰 많은 순' }
 
 function getTodayLabel() {
   const d = new Date()
-  return `오늘 ${d.getMonth() + 1}월 ${d.getDate()}일 (${DAY_KO[d.getDay()]})`
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 ${DAY_KO[d.getDay()]}요일`
+}
+
+function sortMenus(menus, sort) {
+  return [...menus].sort((a, b) => {
+    if (sort === 'name') return a.name.localeCompare(b.name, 'ko')
+    if (sort === 'reviewCount') {
+      if ((b.reviewCount ?? 0) !== (a.reviewCount ?? 0)) return (b.reviewCount ?? 0) - (a.reviewCount ?? 0)
+      return a.name.localeCompare(b.name, 'ko')
+    }
+    if ((b.avgOverall ?? -1) !== (a.avgOverall ?? -1)) return (b.avgOverall ?? -1) - (a.avgOverall ?? -1)
+    return a.name.localeCompare(b.name, 'ko')
+  })
+}
+
+function SortDropdown({ value, onChange }) {
+  return (
+    <div className="relative inline-flex items-center">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="appearance-none bg-transparent text-[13px] font-semibold text-g700 outline-none cursor-pointer pr-3.5"
+      >
+        {Object.entries(SORT_LABELS).map(([k, label]) => (
+          <option key={k} value={k}>{label}</option>
+        ))}
+      </select>
+      <span className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2">
+        <Icon name="chevD" size={9} color="#4E5968" />
+      </span>
+    </div>
+  )
+}
+
+function MenuSkeleton() {
+  return (
+    <div className="divide-y divide-g100">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="flex items-center gap-3.5 py-[13px] animate-pulse">
+          <div className="w-[50px] h-[50px] rounded-[12px] bg-g100 flex-shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3 bg-g100 rounded-full w-12" />
+            <div className="h-4 bg-g100 rounded-full w-32" />
+          </div>
+          <div className="space-y-1.5 flex-shrink-0">
+            <div className="h-3 bg-g100 rounded-full w-10" />
+            <div className="h-2.5 bg-g100 rounded-full w-8 ml-auto" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function BestSkeleton() {
+  return (
+    <div className="flex gap-3 px-6 pb-[22px] overflow-hidden">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="flex-shrink-0 w-[124px] animate-pulse">
+          <div className="w-[124px] h-[124px] rounded-[14px] bg-g100" />
+          <div className="h-4 bg-g100 rounded-full mt-2 w-20" />
+          <div className="h-3 bg-g100 rounded-full mt-1.5 w-12" />
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export default function HomePage() {
-  const [selectedMenu, setSelectedMenu] = useState(null)
-  const { isLoggedIn } = useAuth()
+  const navigate = useNavigate()
+  const [sort, setSort] = useState('rating')
 
-  const handleCardClick = (menuId) => {
-    setSelectedMenu(MOCK_TODAY.find((m) => m.menuId === menuId) ?? null)
-  }
+  const { data: todayData, isLoading: isTodayLoading, isError: isTodayError } = useQuery({
+    queryKey: ['menus', 'today', TODAY_SLOT],
+    queryFn: () => getTodayMenus(TODAY_SLOT),
+  })
+  const { data: bestMenus = [], isLoading: isBestLoading } = useQuery({
+    queryKey: ['menus', 'best'],
+    queryFn: getBestMenus,
+  })
+
+  const todayMenus = sortMenus(todayData?.menus ?? [], sort)
+  const hasBest = !isBestLoading && bestMenus.length > 0
 
   return (
-    <div className="p-4 animate-fadeInUp">
-      <h2 className="text-lg font-bold text-gray-900 mb-4">{getTodayLabel()}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {MOCK_TODAY.map((menu) => (
-          <MenuCard key={menu.menuId} {...menu} onClick={handleCardClick} />
-        ))}
+    <div className="animate-fadeInUp">
+      {/* 페이지 헤더 */}
+      <div className="px-6 pt-2 pb-[22px] flex-shrink-0">
+        <div className="text-[13px] font-semibold text-g600">{getTodayLabel()}</div>
+        <div className="text-[24px] font-extrabold tracking-[-0.7px] text-g900 mt-1">SKU 학식</div>
       </div>
-      <MenuDetailModal
-        menu={selectedMenu}
-        isLoggedIn={isLoggedIn}
-        onClose={() => setSelectedMenu(null)}
-      />
+
+      {/* 이번 주 BEST */}
+      <section className="mb-2">
+        <div className="px-6 pb-3 flex items-baseline justify-between">
+          <div className="text-[18px] font-extrabold tracking-[-0.4px] text-g900">
+            이번 주 베스트{' '}
+            {!isBestLoading && bestMenus.length > 0 && (
+              <span className="text-coral">{Math.min(bestMenus.length, 5)}</span>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/menus?sort=rating')}
+            className="text-[13px] font-semibold text-g600"
+          >
+            전체
+          </button>
+        </div>
+
+        {isBestLoading ? (
+          <BestSkeleton />
+        ) : hasBest ? (
+          <BestRow items={bestMenus.slice(0, 5)} onItemClick={(id) => navigate(`/menus/${id}`)} />
+        ) : (
+          <div className="px-6 pb-[22px] text-[13px] text-g500">
+            아직 베스트 메뉴가 없어요
+          </div>
+        )}
+      </section>
+
+      {/* 오늘의 메뉴 */}
+      <section className="px-6">
+        <div className="flex items-center justify-between mb-1.5">
+          <div className="text-[17px] font-extrabold tracking-[-0.4px] text-g900">오늘의 메뉴</div>
+          <SortDropdown value={sort} onChange={setSort} />
+        </div>
+
+        {isTodayLoading ? (
+          <MenuSkeleton />
+        ) : isTodayError ? (
+          <Empty
+            icon="soup"
+            title="메뉴를 불러오지 못했습니다"
+            description="잠시 후 다시 시도해주세요"
+          />
+        ) : todayMenus.length === 0 ? (
+          <Empty
+            icon="soup"
+            title="아직 오늘 식단이 등록되지 않았어요"
+            description={"매주 월요일 아침에 업데이트됩니다.\n조금만 기다려주세요!"}
+            cta={{ label: '지난 주 BEST 보기', onClick: () => navigate('/menus?sort=rating') }}
+          />
+        ) : (
+          <div className="divide-y divide-g100">
+            {todayMenus.map((menu) => (
+              <button
+                key={menu.id}
+                type="button"
+                onClick={() => navigate(`/menus/${menu.id}`)}
+                className="w-full flex items-center gap-3.5 py-[13px] text-left active:bg-g50 transition-colors"
+              >
+                <Thumb corner={menu.corner} size={50} radius={12} />
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[12px] font-medium text-g500">{menu.corner}</span>
+                    {menu.isNew && (
+                      <span className="text-[10px] font-bold text-coral bg-coralSoft px-1.5 py-px rounded-[3px]">
+                        NEW
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[15.5px] font-bold tracking-[-0.3px] text-g900 mt-px truncate">
+                    {menu.name}
+                  </div>
+                </div>
+
+                <div className="text-right flex-shrink-0">
+                  {menu.avgOverall != null ? (
+                    <>
+                      <div className="flex items-center gap-1 justify-end">
+                        <Icon name="star" size={12} color="#FF6B5C" />
+                        <span className="text-[14px] font-bold text-g900">{menu.avgOverall.toFixed(1)}</span>
+                      </div>
+                      <div className="text-[11px] text-g500 mt-0.5">리뷰 {menu.reviewCount}</div>
+                    </>
+                  ) : (
+                    <div className="text-[11px] text-g400">리뷰 없음</div>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   )
 }

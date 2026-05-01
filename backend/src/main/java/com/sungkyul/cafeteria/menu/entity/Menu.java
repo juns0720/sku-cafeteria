@@ -58,6 +58,26 @@ public class Menu {
     @Builder.Default
     private int reviewCount = 0;
 
+    public boolean syncSeenDates(LocalDate servedDate) {
+        if (servedDate == null) {
+            return false;
+        }
+
+        boolean changed = false;
+
+        if (firstSeenAt == null || servedDate.isBefore(firstSeenAt)) {
+            firstSeenAt = servedDate;
+            changed = true;
+        }
+
+        if (lastSeenAt == null || servedDate.isAfter(lastSeenAt)) {
+            lastSeenAt = servedDate;
+            changed = true;
+        }
+
+        return changed;
+    }
+
     public void applyStats(Double avgT, Double avgA, Double avgV, long count) {
         this.avgTaste   = avgT;
         this.avgAmount  = avgA;

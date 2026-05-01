@@ -1,104 +1,135 @@
-# Frontend Design System (v2)
+# Frontend Design System (v3 Coral)
 
-> 2026-04-19 전면 개편. v1(Zomato 레드)은 [`archive/DESIGN-v1.md`](./archive/DESIGN-v1.md)에 보존.
+> 2026-04-27 전면 개편. v2(종이/잉크 톤)는 [`archive/DESIGN-v2.md`](./archive/DESIGN-v2.md), v1(Zomato 레드)은 [`archive/DESIGN-v1.md`](./archive/DESIGN-v1.md)에 보존.
+> 원본 디자인 핸드오프: [`new_handoff/`](../new_handoff/) (`tokens.md` / `components.md` / `screens/0X-*.md` / `source/coral-*.jsx`).
 
 ## [1] 디자인 컨셉
 
-**"Pencil & Warm"** — 따뜻한 크림 종이 + 잉크 라인 + 손글씨 톤. 음식의 따뜻함과 학생식당의 친근함을 강조한다.
+**"Modern · Clean · Coral"** — 순백 베이스 + Toss 호환 그레이 스케일 + 코랄 단일 액센트. 따뜻함은 색이 아닌 둥근 모서리와 친근한 카피로 표현한다.
 
 - 모바일 우선 (375 × 760), 데스크톱은 중앙 프레임
-- 음식 이미지는 SVG 일러스트(`FoodIllust`) 플레이스홀더 → 점진적 사진 도입
-- 강조: 라인 1.5px, 플랫 오프셋 그림자(`2px 3px 0`), 손글씨 폰트
-- 인터랙션: 200~250ms ease-out, 별점 선택 시 `scale(1.15)` pop
+- 음식 이미지는 단색 그레이 박스 + SVG 아이콘 (사진 미입력 시 fallback)
+- **별 색은 모두 코랄(#FF6B5C)** — 노랑 별은 v3에서 사용 금지
+- **카테고리 썸네일은 모두 단색 그레이(#F2F4F6)** — 카테고리별 컬러 부활 금지 (로그인 화면 일러스트 3개만 예외)
+- 강조: 헤어라인 1px (`#F2F4F6`/`#E5E8EB`), 그림자는 모바일 프레임만 사용
+- 인터랙션: 200~250ms ease-out
 
 ---
 
 ## [2] 컬러 팔레트
 
-```css
-:root {
-  --paper:       #FBF6EC;   /* 기본 배경 */
-  --paper-deep:  #F4ECDC;   /* 카드 배경 */
-  --ink:         #2B2218;   /* 본문/테두리 */
-  --ink-soft:    #574635;   /* 보조 텍스트 */
-  --mute:        #8E7A66;   /* 비활성/메타 */
-  --rule:        #D8CBB6;   /* 구분선/점선 */
+### 액센트
+| 토큰 | HEX | 용도 |
+|---|---|---|
+| `coral` | `#FF6B5C` | CTA, 별, 1위 뱃지, NEW 텍스트, 진행도 바, 강조 숫자 |
+| `coralSoft` | `#FFEEEC` | NEW 뱃지 배경, 로그인 일러스트 박스 |
 
-  --orange:      #EF8A3D;   /* 액센트(CTA, NEW) */
-  --orange-soft: #FCE3C9;   /* CTA 배경, 스플래시 */
-  --yellow:      #F4B73B;   /* 별점, 메달 노랑 */
-  --yellow-soft: #FBE6A6;
-  --green:       #4A8F5B;   /* 성공, 베스트 */
-  --green-soft:  #CDE5C8;
-  --peach:       #F6C7A8;   /* 일러스트 */
-  --red:         #D9543A;   /* 에러 */
-}
-```
+### 그레이 스케일 (Toss 호환)
+| 토큰 | HEX | 용도 |
+|---|---|---|
+| `g50` | `#F9FAFB` | 부드러운 카드 배경, 코멘트 입력 박스 |
+| `g100` | `#F2F4F6` | 음식 썸네일 배경, 비활성 칩, 진행도 바 트랙, 헤어라인 |
+| `g200` | `#E5E8EB` | 카드 보더 |
+| `g300` | `#D1D6DB` | 빈 별 색 |
+| `g400` | `#B0B8C1` | 비활성 탭 아이콘, chev |
+| `g500` | `#8B95A1` | 메타 텍스트, 음식 썸네일 아이콘 |
+| `g600` | `#6B7684` | 서브 텍스트, "전체" 액션 |
+| `g700` | `#4E5968` | 본문 그레이, 칩 활성 텍스트 |
+| `g800` | `#333D4B` | (예비) |
+| `g900` | `#191F28` | 본문 잉크, 메인 타이틀, 활성 칩 배경 |
+
+### 로그인 화면 한정 컬러 (예외)
+| 카테고리 | 배경 | 아이콘 |
+|---|---|---|
+| 한식 (웜 레드) | `#FFF1ED` | `#E5766C` |
+| 양식 (앰버) | `#FFF5E0` | `#E29A38` |
+| 일품 (그린) | `#EAF6EE` | `#5A9C6E` |
 
 ---
 
 ## [3] 타이포그래피
 
-| 역할 | 폰트 | 비고 |
-|---|---|---|
-| 본문/UI (한글) | **Gaegu** | Google Fonts, 손글씨 톤 |
-| 강조/타이틀 | **Jua** | Google Fonts, 둥근 sans |
-
 ```html
-<!-- index.html -->
-<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&display=swap" rel="stylesheet">
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 ```
 
 ```css
-:root {
-  --font-hand: 'Gaegu', system-ui, sans-serif;
-  --font-disp: 'Jua', system-ui, sans-serif;
-}
+font-family: "Pretendard", -apple-system, BlinkMacSystemFont,
+             "Apple SD Gothic Neo", system-ui, sans-serif;
 ```
 
-### 사이즈 스케일
+### 사이즈/웨이트 매트릭스
 
-| 토큰 | 크기 | 용도 |
-|---|---|---|
-| `text-xs` | 11px | 메타·부제 |
-| `text-sm` | 13px | 본문 보조 |
-| `text-base` | 15px | 본문 |
-| `text-lg` | 17px | 메뉴명 |
-| `text-xl` | 20px | 섹션 라벨 |
-| `text-2xl` | 24px | 페이지 헤더 |
-| `text-3xl` | 30px | 브랜드 타이틀 (Jua) |
+| 역할 | size | weight | letter-spacing | 예시 |
+|---|---|---|---|---|
+| Display L | 30 | 800 | -0.9 | 로그인 메인 카피 |
+| Display M | 26 | 800 | -0.7 ~ -0.8 | 닉네임 카피, 평균 점수 |
+| Display S | 24 | 800 | -0.7 | 홈 "SKU 학식" 타이틀 |
+| Hero | 22 | 800 | -0.5 | 핸드오프 섹션 타이틀 |
+| Title L | 18 | 800 | -0.4 | "오늘의 베스트 5" |
+| Title M | 17 | 800 | -0.4 | 헤더 타이틀, "오늘의 메뉴" |
+| Title S | 16 | 800 | -0.3 | 메뉴명, 섹션 타이틀 |
+| Body L | 15-16 | 700 | -0.3 | 메뉴명 (리스트) |
+| Body | 14-15 | 600~700 | -0.2 | 일반 본문 |
+| Caption | 13 | 600 | -0.2 | 메타, 서브텍스트 |
+| Meta | 12 | 500~600 | 0 | 카테고리 라벨 |
+| Micro | 11 | 500~700 | 0 | 뱃지, 탭 라벨 |
+| Tiny | 10 | 700~800 | 0 | NEW · 1위 뱃지 |
+
+### 자간 룰
+- 800 굵기 + 16px 이상: -0.3 ~ -0.9
+- 700 굵기 + 14~15px: -0.2 ~ -0.3
+- 500~600 + 11~13px: 0 (또는 -0.2 강조 시)
 
 ---
 
-## [4] 스트로크 / 라운드 / 그림자
+## [4] 모서리 / 스페이싱 / 그림자
 
+### Border Radius
+| 토큰 | 값 | 용도 |
+|---|---|---|
+| `r-xs` | 3-4 | 작은 NEW 뱃지 |
+| `r-sm` | 6-8 | 소형 칩 |
+| `r-md` | 12 | 작은 썸네일, 입력 |
+| `r-lg` | 14 | 중간 카드, 버튼 |
+| `r-xl` | 16 | 카드 |
+| `r-2xl` | 18 | 큰 카드 (프로필) |
+| `r-3xl` | 20 | 히어로 박스 |
+| `r-pill` | 999 | 칩, 라운드 뱃지 |
+| `r-frame` | 32 | 모바일 프레임 외각 |
+
+### 스페이싱
+| 항목 | 값 |
+|---|---|
+| 화면 좌우 패딩 | 24px |
+| 헤더 좌우 패딩 | 16px |
+| 카드 내부 패딩 | 14-16px |
+| 섹션 간격 | 18-24px |
+| 리스트 row vertical padding | 13px |
+| 가로 스크롤 gap | 12px |
+
+### 그림자
 ```css
-:root {
-  --stroke: 1.5px;
-  --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 20px;
-  --r-screen: 32px;        /* 모바일 프레임 */
-
-  --shadow-flat: 2px 3px 0 rgba(43, 34, 24, 0.18);
-  --shadow-card: 2px 3px 0 rgba(43, 34, 24, 0.12);
-  --shadow-pop:  3px 4px 0 rgba(43, 34, 24, 0.22);
-}
+/* 모바일 프레임 (외각만 사용) */
+box-shadow:
+  0 2px 8px rgba(0,0,0,0.06),
+  0 12px 40px rgba(0,0,0,0.08);
 ```
 
-테두리는 모두 `border: var(--stroke) solid var(--ink)`. 점선은 `border-dashed` + `--rule`.
+화면 내부 카드는 그림자 사용 금지. 헤어라인(`1px solid #F2F4F6` 또는 `#E5E8EB`)으로 분리.
 
 ---
 
 ## [5] 모바일 프레임 / 그리드
 
-| 환경 | 너비 | 좌우 패딩 | 비고 |
-|---|---|---|---|
-| 모바일 | 375 (고정) | 16px | `Screen` 컴포넌트 |
-| 태블릿 | 768 | 24px | 중앙 정렬 (Screen 그대로) |
-| 데스크톱 | 1280 | 24px | 중앙 1100px max + 좌우 여백 |
+| 환경 | 너비 | 좌우 패딩 |
+|---|---|---|
+| 모바일 | 375 (고정) | 24px |
+| 태블릿 | 768 | 24px (중앙 정렬) |
+| 데스크톱 | 1280 | 중앙 1100px max + 좌우 여백 |
 
-`Screen` = 375 × 760 둥근(`--r-screen`) 종이 카드. 데스크톱에선 중앙 정렬된 단일 프레임.
+`Frame` = 375 × 760 + `r-frame` 32px + frame shadow. 데스크톱에선 중앙 단일 프레임.
 
 ```
 모바일 메뉴 카드: 1열
@@ -108,128 +139,93 @@
 
 ---
 
-## [6] 디자인 시스템 — 기초 컴포넌트 (`src/components/hi/`)
+## [6] 컴포넌트 — 기초 (`src/components/coral/`)
+
+`new_handoff/source/coral-system.jsx`의 명세를 그대로 옮긴다. **외부 아이콘 라이브러리(lucide, hero-icons 등) 금지** — `components.md`의 SVG path를 그대로 복사.
 
 | 컴포넌트 | 역할 |
 |---|---|
-| `Screen` | 모바일 프레임 래퍼 (375 × 760, `--r-screen`) |
-| `Icon` | 14종 라인 SVG: bowl/soup/chop/star/starO/search/home/cal/list/user/heart/gear/pencil/cam/medal/fire/chev/x/plus/filter |
-| `FoodIllust` | 원형 배경(`--peach` 등) + Icon 조합. 사진 미입력 시 fallback. |
-| `Pill` | 작은 라벨 (NEW / 베스트 / TOP5 / 메달). 색상 토큰 props |
-| `Card` | 1.5px ink 테두리 + 플랫 오프셋 그림자 |
-| `Button` | `primary`(ink 배경 + paper 텍스트) / `default`(paper + ink 테두리) |
-| `Stars` | 별점 행. 반올림 0.5 단위. props `size: 10/14/32` |
-| `UL` | 웨이브 언더라인 SVG 반복 (제목 강조) |
-| `SecLabel` | 섹션 라벨 + 우측 액세서리 슬롯 |
-| `AxisBar` | 3축 1행 (라벨 + 1~5 바 + 수치) |
+| `Frame` | 모바일 프레임 (375 × 760 + r-frame 32 + frame shadow). 웹앱 모바일은 `width:100%; height:100dvh; border-radius:0` |
+| `Status` | 상단 상태 바 (32px). 시간 + 신호/배터리 |
+| `Header` | 화면 헤더 (좌·중·우 슬롯, padding `6 16 12`, minHeight 48) |
+| `Tab` | 하단 탭바 (64px, 4탭 균등). 활성=coral/700, 비활성=g500/500. 탭: home/week/all/me |
+| `Icon` | 21종 SVG (`bowl/soup/chop/home/cal/list/user/chev/chevD/chevL/chevR/star/starO/heart/heartF/x/pencil/cam/gear/search/filter/medal/check/plus/arrow`). props: `name`/`size`/`color`/`weight` |
+| `Stars` | 5개 별 (코랄). Math.round(value) 채움, 빈별 g300. props: `value`/`size` |
+| `Chip` | 칩/필터 (padding `8 14`, r-pill, 13px/600). active=g900 BG / 흰색 텍스트, inactive=g100 BG / g700 텍스트 |
+| `Sec` | 섹션 헤더 (title 18/800/-0.4/g900, right 13/600/g600 액션, sub 12/500/g500) |
+| `Button` | primary(g900 BG/흰색) / accent(coral BG/흰색) / ghost(g50 BG/g700). size lg(16 20, 16/700, r 14) / md(12 16, 14/700, r 12) |
+| `Thumb` | 음식 썸네일. 배경 g100, 아이콘 g500, weight 1.5~1.6. corner→illustration 매핑 내장. **로그인 제외 단색 그레이 절대 규칙** |
 
-## [7] 디자인 시스템 — 컴포지트
+### Thumb 사이즈 매트릭스
+| 사용 위치 | size | radius | icon size |
+|---|---|---|---|
+| 홈 베스트 카드 | 124 | 14 | 50 |
+| 홈 운영중 row | 50 | 12 | 24 |
+| 주간 / 전체 row | 48 | 12 | 24 |
+| 상세 헤더 | 140 | 24 | 70 |
+| 메뉴 칩 | 28-48 | 12-14 | 16-24 |
+
+### corner → illustration 매핑 (D10)
+```js
+const ICON_BY_CORNER = {
+  '한식': 'bowl', '양식': 'chop', '분식': 'soup', '일품': 'bowl', '중식': 'soup',
+  KOREAN: 'bowl', WESTERN: 'chop', SNACK: 'soup', SPECIAL: 'bowl',
+};
+```
+
+## [7] 컴포넌트 — 컴포지트
 
 | 컴포넌트 | 역할 |
 |---|---|
-| `TabBarHi` | 4탭 하단바 (홈/주간/전체/프로필) |
-| `BestCarousel` | TOP 5 가로 스크롤 + 페이드 마스크 |
-| `WeekDayTabs` | 월~금 균등 5분할 탭 |
-| `CornerFilterChips` | 코너 필터 칩 가로 스크롤 |
-| `MedalSticker` | 🥇/🥈/🥉 원형 스티커 (전체 메뉴 리스트) |
-| `MultiStarRating` | 3축 32px 큰 별 입력 |
-| `MultiStarSummary` | 리뷰 카드 안 "맛 5 양 4 가성비 5" 한 줄 |
-| `BadgeProgressBar` | 다음 뱃지 진행도 (10px, 마커) |
-| `StatsGrid` | 통계 카드 3개 grid |
-| `EmptyState` | 빈 상태 (회전 일러스트 + 메시지) |
+| `BestRow` | TOP 5 가로 스크롤 (124×124 카드 + 1위 뱃지 + 메뉴명 + 별점) |
+| `WeekPicker` | 월~금 5분할 요일 탭 (활성 g900 BG) |
+| `CategoryFilter` | 코너 필터 칩 가로 스크롤 |
+| `MedalDot` | 🥇/🥈/🥉 작은 원형 스티커 (전체 메뉴 리스트) |
+| `MultiStarInput` | 3축 32px 큰 별 입력 (맛/양/가성비). 선택 시 `scale(1.15)` pop |
+| `MultiStarSummary` | 리뷰 카드 안 한 줄 ("맛 5 양 4 가성비 5") |
+| `ProgressBar` | 다음 뱃지 진행도 (트랙 g100, fill coral, 10px height + 마커) |
+| `StatsGrid` | 통계 카드 3개 grid (리뷰 / 평점 / 메달) |
+| `Empty` | 빈 상태 (회전 일러스트 + 메시지 + 옵션 CTA) |
+| `AxisProgress` | 메뉴 상세 3축 평균 막대 (5분할, fill coral) |
 
-`Screen`/`Icon`/그 외 모든 신규 컴포넌트는 **`frontend/src/components/hi/`** 하위에 둔다. 기존 `components/` 아래는 v1 컴포넌트(점진 교체).
-
----
-
-## [8] 페이지 레이아웃 (7화면)
-
-### 8.1 홈 `/`
-```
-┌──────────────────────────────────┐
-│ [헤더: 학식 today]      [user]   │
-│ ✨ 오늘 메뉴 (LUNCH)              │
-│ ── 코너 리스트 (정렬↓)            │
-│ 🏆 이번 주 BEST  → 가로 5개       │
-│ ┌────┐ ┌────┐ ...  BestCarousel │
-│ └────┘ └────┘                   │
-└──────────────────────────────────┘
-[홈] [주간] [전체] [프로필]  TabBarHi
-```
-
-### 8.2 주간 `/weekly`
-```
-┌──────────────────────────────────┐
-│ [헤더: 주간 식단]                 │
-│ [월] [화] [수] [목▶] [금]  WeekDayTabs │
-│ ── 선택한 요일의 코너 리스트       │
-│  [한식]  메뉴1 [NEW] ★4.3        │
-│  [양식]  메뉴2                   │
-└──────────────────────────────────┘
-```
-
-### 8.3 전체 메뉴 `/menus`
-```
-┌──────────────────────────────────┐
-│ 🔍 검색 입력                      │
-│ CornerFilterChips: 전체|한식...   │
-│ 정렬 안내: 별점↓                  │
-│ ── 점선 구분 리스트                │
-│ 🥇 메뉴 ★4.7 (24)                │
-│ 🥈 메뉴 ★4.2 (12) [NEW]          │
-└──────────────────────────────────┘
-```
-
-### 8.4 메뉴 상세 `/menus/:id`
-```
-┌──────────────────────────────────┐
-│ [← 뒤로]                          │
-│ FoodIllust 큰 헤더                │
-│ 메뉴명 (Jua) · 코너 · 날짜         │
-│ AxisBar 3축 평균                  │
-│ ── 리뷰 리스트 ──                 │
-│ [리뷰] 닉네임 🥈                  │
-│         MultiStarSummary         │
-│         코멘트 + 사진 썸네일       │
-│                                  │
-│ [⌥ 리뷰 쓰기 CTA]                │
-└──────────────────────────────────┘
-```
-
-### 8.5 리뷰 작성 `/menus/:id/review`
-```
-┌──────────────────────────────────┐
-│ [← 취소]   리뷰 쓰기   [등록]     │
-│ FoodIllust + 메뉴명               │
-│ MultiStarRating (32px 별 3행)    │
-│   맛 ★★★★★                       │
-│   양 ★★★★☆                       │
-│   가성비 ★★★★★                    │
-│ 한 마디 textarea (500자)          │
-│ [+ 사진 첨부] (Phase D)           │
-└──────────────────────────────────┘
-```
-
-### 8.6 프로필 `/profile`
-```
-┌──────────────────────────────────┐
-│ [user 아바타 색상원] 닉네임 ✎      │
-│ 🥈 다음 뱃지까지 N개               │
-│ BadgeProgressBar                 │
-│ StatsGrid (리뷰 / 평점 / 메달)     │
-│ ── 내가 쓴 리뷰 (압축형) ──       │
-│ [로그아웃]                        │
-└──────────────────────────────────┘
-```
-
-### 8.7 온보딩 (3종 시퀀스)
-1. **OnboardingLogin** — orangeSoft 배경 + Google G 로고 (스플래시)
-2. **NicknameSetupModal** — 추천 닉네임 칩 5개 + 가용성 체크 (한 번 정하면 30일간 변경 어려움 안내)
-3. **EmptyState** — 메뉴/리뷰 없을 때 회전 일러스트 + "첫 리뷰의 주인공이 되어보세요"
+신규 컴포넌트는 모두 `frontend/src/components/coral/` 하위에 둔다. (기존 `components/hi/`는 v2, Phase v3-3에서 일괄 삭제)
 
 ---
 
-## [9] 메달 / 뱃지 임계값
+## [8] 페이지 레이아웃 (9화면)
+
+각 화면의 픽셀 명세는 `new_handoff/screens/0X-*.md` 1차 참조. 본 섹션은 라우트·구성 요약.
+
+### 8.1 홈 `/` ([screens/01-home.md](../new_handoff/screens/01-home.md))
+헤더 "SKU 학식" + 🏆 BEST 5 가로 스크롤 + ✨ 오늘 메뉴 (LUNCH) 코너별 리스트 + Tab(home)
+
+### 8.2 주간 `/weekly` ([screens/02-week.md](../new_handoff/screens/02-week.md))
+헤더 "주간 식단" + WeekPicker(월~금) + 선택 요일 코너 리스트 + Tab(week). 주간 화면에는 1위 뱃지 없음 (NEW만)
+
+### 8.3 전체 `/menus` ([screens/03-all.md](../new_handoff/screens/03-all.md))
+헤더 + 검색 입력 + CategoryFilter + 정렬 드롭다운 + 헤어라인 리스트(MedalDot + 메뉴명 + Stars + reviewCount) + Tab(all)
+
+### 8.4 메뉴 상세 `/menus/:id` ([screens/04-detail.md](../new_handoff/screens/04-detail.md))
+헤더(← 뒤로) + 140×140 Thumb + 메뉴명/코너 + AxisProgress 3축 + 리뷰 리스트(MultiStarSummary + 코멘트 + 사진) + ✎ 리뷰 쓰기 CTA
+
+### 8.5 리뷰 작성 `/menus/:id/review` ([screens/05-write.md](../new_handoff/screens/05-write.md))
+헤더(← 취소 / "리뷰 쓰기" / 등록) + Thumb + 메뉴명 + MultiStarInput 3행 + textarea(500자) + + 사진 첨부 (Phase D)
+
+### 8.6 프로필 `/profile` ([screens/06-profile.md](../new_handoff/screens/06-profile.md))
+avatarColor 색상원 + 닉네임 + ✎ + 다음 뱃지 진행도 + ProgressBar + StatsGrid + 내 리뷰(압축) + 로그아웃 + Tab(me)
+
+### 8.7 로그인 `/login` ([screens/07-login.md](../new_handoff/screens/07-login.md))
+**유일한 컬러 일러스트 화면**. coralSoft 배경 + 카테고리 일러스트 3개 + Google G 로고 버튼
+
+### 8.8 닉네임 설정 (모달, [screens/08-nickname.md](../new_handoff/screens/08-nickname.md))
+`createPortal(..., document.body)`. 닫기 불가. 추천 칩 5개 + 가용성 체크. 30일 쿨다운 안내
+
+### 8.9 빈 상태 ([screens/09-empty.md](../new_handoff/screens/09-empty.md))
+회전 Icon + 메시지 + 옵션 CTA. Home/Weekly/AllMenus/Profile/MenuDetail의 데이터 0건 분기에서 사용
+
+---
+
+## [9] 메달 / 뱃지 임계값 (도메인 — v2와 동일)
 
 ### 사용자 뱃지 (`BadgeTier.of(reviewCount)`)
 | 뱃지 | 조건 |
@@ -250,6 +246,8 @@
 ### NEW 윈도우
 - `firstSeenAt + 7일` 이내면 `isNew = true`
 
+> 임계값은 백엔드의 `BadgeTier` / `MenuTier` enum과 일치한다. 변경 시 [`docs/api.md`](./api.md), [`docs/conventions.md`](./conventions.md)도 함께 갱신.
+
 ---
 
 ## [10] 애니메이션
@@ -260,7 +258,7 @@
 | 카드 tap | `scale(0.98)` | 120ms |
 | 별점 선택 | `scale(1.15)` pop | 150ms |
 | 모달 진입 | overlay `fadeIn` + 시트 `slideUp` | 220ms |
-| EmptyState 일러스트 | `rotate(-6deg → 0deg)` 미세 회전 | 800ms ease-out |
+| Empty 일러스트 | `rotate(-6deg → 0deg)` 미세 회전 | 800ms ease-out |
 
 ```css
 @keyframes fadeInUp {
@@ -271,17 +269,33 @@
 
 ---
 
-## [11] 참고 라이브러리
+## [11] 절대 규칙 (Coral 핸드오프 검증 체크리스트)
+
+배포 전 다음 항목을 모두 확인:
+
+- [ ] 모든 화면이 `375 × 760` 모바일 폭에서 디자인과 동일
+- [ ] 음식 썸네일이 모두 `#F2F4F6` 단색 그레이 (로그인 일러스트 3개만 예외)
+- [ ] 별 색이 모두 코랄(`#FF6B5C`) — 노랑(#F4B73B) 흔적 없음
+- [ ] 알림(bell) 아이콘이 어디에도 노출되지 않음
+- [ ] 주간 화면에 1위 뱃지 없음 (NEW만)
+- [ ] 폰트가 Pretendard로 적용 — Gaegu/Jua 흔적 없음
+- [ ] 프로필 카드 배경이 `#F9FAFB` (coralSoft 부활 X)
+- [ ] 외부 아이콘 라이브러리(lucide-react 등) 의존성 없음
+- [ ] `components/hi/` 잔재 없음 (Phase v3-3 V3-T17 완료 후)
+
+---
+
+## [12] 참고 라이브러리
 
 | 라이브러리 | 용도 |
 |---|---|
-| (없음) | 아이콘은 `Icon` 컴포넌트로 자체 SVG 14종. lucide-react 의존성 제거 |
+| (없음) | 아이콘은 `Icon` 컴포넌트 자체 SVG 21종. 외부 라이브러리 금지 |
 | `@react-oauth/google` | Google 로그인 |
 | `@tanstack/react-query` | 서버 상태 (캐싱, 낙관적 업데이트) |
 
 ---
 
-## [12] Tailwind 설정 가이드
+## [13] Tailwind 설정 가이드
 
 `tailwind.config.js`에 토큰 등록:
 
@@ -290,26 +304,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: '#FBF6EC', paperDeep: '#F4ECDC',
-        ink: '#2B2218', inkSoft: '#574635', mute: '#8E7A66', rule: '#D8CBB6',
-        orange: '#EF8A3D', orangeSoft: '#FCE3C9',
-        yellow: '#F4B73B', yellowSoft: '#FBE6A6',
-        green: '#4A8F5B', greenSoft: '#CDE5C8',
-        peach: '#F6C7A8', red: '#D9543A',
+        coral: '#FF6B5C', coralSoft: '#FFEEEC',
+        g50: '#F9FAFB', g100: '#F2F4F6', g200: '#E5E8EB', g300: '#D1D6DB',
+        g400: '#B0B8C1', g500: '#8B95A1', g600: '#6B7684', g700: '#4E5968',
+        g800: '#333D4B', g900: '#191F28',
       },
       boxShadow: {
-        flat: '2px 3px 0 rgba(43,34,24,0.18)',
-        card: '2px 3px 0 rgba(43,34,24,0.12)',
-        pop:  '3px 4px 0 rgba(43,34,24,0.22)',
+        frame: '0 2px 8px rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.08)',
       },
       fontFamily: {
-        hand: ['Gaegu', 'system-ui', 'sans-serif'],
-        disp: ['Jua', 'system-ui', 'sans-serif'],
+        pretendard: ['Pretendard', '-apple-system', 'BlinkMacSystemFont',
+                     'Apple SD Gothic Neo', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
-        screen: '32px',
+        '2xs': '4px', xs: '6px', frame: '32px',
       },
     },
   },
 }
 ```
+
+base 폰트는 `body { font-family: theme('fontFamily.pretendard') }`로 설정.
+
+> **v2 토큰(paper/ink/orange/yellow/green/peach 등)은 Phase v3-1까지 유지** (병행 작업 보호용). Phase v3-3 V3-T17에서 일괄 제거.

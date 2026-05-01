@@ -2,7 +2,7 @@
 
 모든 엔드포인트 prefix: `/api/v1/` (Cron 트리거만 `/api/cron/`)
 
-> **현재 상태 표기**: 일부 필드/엔드포인트는 [UI/UX 개편 플랜](./plans/ui-ux-redesign/00-overview.md)에서 추가/변경 예정이다. 본 문서는 **개편 후 최종 시그니처**를 명세한다. 미구현 항목은 `(예정: P*-T*)`로 표기.
+> **현재 상태 표기**: BE는 v2 Phase 1~2에서 모든 응답 확장이 완료됐다. v3 Coral Redesign은 FE 전용이라 BE 시그니처 변경 없음. 미구현은 V3-T19(reviews.image_url DROP)와 PD-T1(Cloudinary upload-signature)만. 결정 사항(D1~D8) 근거는 [v2 archive overview](./plans/archive/ui-ux-redesign-v2/00-overview.md) 참조.
 
 ---
 
@@ -24,7 +24,7 @@
 | `profileImage` | String? | Google 프로필 |
 | `isNicknameSet` | boolean | 최초 로그인 후 NicknameSetupModal 트리거 |
 | `avatarColor` | String | hex (예: `#EF8A3D`), 기본 orange |
-| `badgeTier` | enum | `NONE/BRONZE/SILVER/GOLD` (1/5/30 임계값, [D1](./plans/ui-ux-redesign/00-overview.md)) |
+| `badgeTier` | enum | `NONE/BRONZE/SILVER/GOLD` (1/5/30 임계값, [D1](./plans/archive/ui-ux-redesign-v2/00-overview.md)) |
 | `reviewCount` | long | 작성 리뷰 수 |
 | `avgRating` | Double? | 본인이 매긴 평점 평균 (없으면 null) |
 | `badgeCount` | long | 보유 메달 수 (참조용) |
@@ -53,7 +53,7 @@
 - `scope`: `reviewed`(기본, 리뷰 있는 메뉴만) / `all`(전체) — P2-T6
 - `corner`: 한식/양식/분식/일품 등 문자열 필터
 
-### `/menus/best` 사양 ([D3](./plans/ui-ux-redesign/00-overview.md))
+### `/menus/best` 사양 ([D3](./plans/archive/ui-ux-redesign-v2/00-overview.md))
 
 이번 주(월~일) 제공된 메뉴 중 **리뷰 ≥ 3**, `avgOverall desc`, **TOP 5** 반환.
 
@@ -63,11 +63,11 @@
 |---|---|---|
 | `id` | Long | |
 | `name` | String | |
-| `corner` | String | DB는 VARCHAR 유지, 응답은 [Corner enum 매핑값](./plans/ui-ux-redesign/00-overview.md) (KOREAN/WESTERN/SNACK/SPECIAL, fallback KOREAN) |
+| `corner` | String | DB는 VARCHAR 유지, 응답은 [Corner enum 매핑값](./plans/archive/ui-ux-redesign-v2/00-overview.md) (KOREAN/WESTERN/SNACK/SPECIAL, fallback KOREAN) |
 | `firstSeenAt` | LocalDate | 최초 등장일 (V8 컬럼화) |
 | `lastSeenAt` | LocalDate | 최근 등장일 |
-| `isNew` | boolean | `firstSeenAt + 7일` 이내 ([D2](./plans/ui-ux-redesign/00-overview.md)) |
-| `tier` | enum? | `GOLD/SILVER/BRONZE/null` ([메뉴 메달 임계값](./plans/ui-ux-redesign/00-overview.md)) |
+| `isNew` | boolean | `firstSeenAt + 7일` 이내 ([D2](./plans/archive/ui-ux-redesign-v2/00-overview.md)) |
+| `tier` | enum? | `GOLD/SILVER/BRONZE/null` ([메뉴 메달 임계값](./plans/archive/ui-ux-redesign-v2/00-overview.md)) |
 | `avgTaste` | Double? | 0건 시 null |
 | `avgAmount` | Double? | |
 | `avgValue` | Double? | |
