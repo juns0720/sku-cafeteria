@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,6 +98,10 @@ public class MenuCrawlerService {
 
                     for (String menuName : menuNames) {
                         if (menuName.isEmpty()) continue;
+                        if (isHolidayMessage(menuName)) {
+                            log.info("[Crawler] 휴일 메시지 skip: '{}'", menuName);
+                            continue;
+                        }
 
                         // (name, corner) 기준으로 upsert — 메뉴 자체는 한 번만 저장
                         Menu menu = menuRepository.findByNameAndCorner(menuName, corner)
@@ -158,6 +163,11 @@ public class MenuCrawlerService {
      * Jsoup .text() 호출 시 br 사이의 텍스트가 공백으로 합쳐져 "월 2026.04.13" 형태가 된다.
      * yyyy.MM.dd 패턴을 정규식으로 직접 추출한다.
      */
+    private static final Set<String> HOLIDAY_KEYWORDS = Set.of(
+            "휴일", "휴무", "휴관", "공휴일", "방학", "운영안함",
+            "운영하지", "없습니다", "쉽니다", "점검", "행사"
+    );
+
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}\\.\\d{2}\\.\\d{2})");
     private static final DateTimeFormatter DOT_DATE_FMT = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
@@ -175,6 +185,13 @@ public class MenuCrawlerService {
             }
         }
         return dates;
+    }
+
+    private boolean isHolidayMessage(String text) {
+        for (String kw : HOLIDAY_KEYWORDS) {
+            if (text.contains(kw)) return true;
+        }
+        return false;
     }
 
     private List<String> splitByBr(Element cell) {
