@@ -1,8 +1,10 @@
 package com.sungkyul.cafeteria.crawler.service;
 
 import com.sungkyul.cafeteria.crawler.dto.CrawlingResult;
+import com.sungkyul.cafeteria.menu.entity.Holiday;
 import com.sungkyul.cafeteria.menu.entity.Menu;
 import com.sungkyul.cafeteria.menu.entity.MenuDate;
+import com.sungkyul.cafeteria.menu.repository.HolidayRepository;
 import com.sungkyul.cafeteria.menu.repository.MenuDateRepository;
 import com.sungkyul.cafeteria.menu.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,7 @@ import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +36,7 @@ public class MenuCrawlerService {
 
     private final MenuRepository menuRepository;
     private final MenuDateRepository menuDateRepository;
+    private final HolidayRepository holidayRepository;
 
     /** 테스트에서 stubbing 가능하도록 분리 (package-private) */
     Document fetchDocument() throws Exception {
@@ -80,6 +81,10 @@ public class MenuCrawlerService {
 
             log.info("[Crawler] 파싱된 날짜: {}", dates);
 
+            // 휴일 감지: 날짜별 (휴일메시지 조우 여부, 저장된 메뉴 수) 추적
+            Set<LocalDate> holidayMessageDates = new HashSet<>();
+            Map<LocalDate, Integer> savedPerDate = new HashMap<>();
+
             Elements rows = table.select("tbody tr");
             for (Element row : rows) {
                 Elements cells = row.select("td");
@@ -100,6 +105,7 @@ public class MenuCrawlerService {
                         if (menuName.isEmpty()) continue;
                         if (isHolidayMessage(menuName)) {
                             log.info("[Crawler] 휴일 메시지 skip: '{}'", menuName);
+                            holidayMessageDates.add(servedDate);
                             continue;
                         }
 
@@ -123,13 +129,26 @@ public class MenuCrawlerService {
                                     MenuDate.builder().menu(menu).servedDate(servedDate).mealSlot("LUNCH").build()
                             );
                             savedCount++;
+                            savedPerDate.merge(servedDate, 1, Integer::sum);
                         }
                     }
                 }
             }
 
-            log.info("[Crawler] 완료 — saved: {}, skipped: {}", savedCount, skippedCount);
-            return CrawlingResult.success(savedCount, skippedCount);
+            // 휴일 메시지가 있었으나 실제 메뉴가 0건인 날짜 → holidays 테이블에 저장
+            int holidayCount = 0;
+            for (LocalDate holidayDate : holidayMessageDates) {
+                if (savedPerDate.getOrDefault(holidayDate, 0) == 0) {
+                    if (!holidayRepository.existsByHolidayDate(holidayDate)) {
+                        holidayRepository.save(Holiday.builder().holidayDate(holidayDate).build());
+                        log.info("[Crawler] 휴일 등록: {}", holidayDate);
+                    }
+                    holidayCount++;
+                }
+            }
+
+            log.info("[Crawler] 완료 — saved: {}, skipped: {}, holidays: {}", savedCount, skippedCount, holidayCount);
+            return CrawlingResult.success(savedCount, skippedCount, holidayCount);
 
         } catch (Exception e) {
             log.error("[Crawler] 크롤링 중 오류 발생: {}", e.getMessage(), e);

@@ -1,8 +1,10 @@
 package com.sungkyul.cafeteria.crawler.service;
 
 import com.sungkyul.cafeteria.crawler.dto.CrawlingResult;
+import com.sungkyul.cafeteria.menu.entity.Holiday;
 import com.sungkyul.cafeteria.menu.entity.Menu;
 import com.sungkyul.cafeteria.menu.entity.MenuDate;
+import com.sungkyul.cafeteria.menu.repository.HolidayRepository;
 import com.sungkyul.cafeteria.menu.repository.MenuDateRepository;
 import com.sungkyul.cafeteria.menu.repository.MenuRepository;
 import org.jsoup.Jsoup;
@@ -32,6 +34,9 @@ class MenuCrawlerServiceTest {
 
     @Mock
     private MenuDateRepository menuDateRepository;
+
+    @Mock
+    private HolidayRepository holidayRepository;
 
     private MenuCrawlerService crawlerService;
 
@@ -107,7 +112,9 @@ class MenuCrawlerServiceTest {
 
     @BeforeEach
     void setUp() {
-        crawlerService = spy(new MenuCrawlerService(menuRepository, menuDateRepository));
+        crawlerService = spy(new MenuCrawlerService(menuRepository, menuDateRepository, holidayRepository));
+        lenient().when(holidayRepository.existsByHolidayDate(any())).thenReturn(false);
+        lenient().when(holidayRepository.save(any(Holiday.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // 기본: 모든 메뉴가 신규 (사용하지 않는 테스트에서 예외가 발생하지 않도록 lenient 설정)
         lenient().when(menuRepository.findByNameAndCorner(any(), any())).thenReturn(Optional.empty());
