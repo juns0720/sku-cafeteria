@@ -1,4 +1,4 @@
-# 진행 상황 (Coral Redesign)
+/re# 진행 상황 (Coral Redesign)
 
 > **역할**: 모든 v3 단위의 체크박스 단일 소스. 완료 즉시 여기만 갱신.
 > **실행 명세**: 각 단위 상세는 `01-phase-1-foundation.md` … `06-phase-d-photo.md`.
