@@ -75,7 +75,7 @@ public class ReviewService {
         Review saved = reviewRepository.save(review);
         recomputeMenuStats(menu.getId());
         BadgeTier tier = BadgeTier.of(reviewRepository.countByUserId(userId));
-        return toResponse(saved, userId, tier);
+        return toResponse(loadReviewForResponse(saved.getId()), userId, tier);
     }
 
     @Transactional(readOnly = true)
@@ -112,9 +112,10 @@ public class ReviewService {
 
         List<String> photos = resolvePhotoUrls(request.photoUrls());
         review.update(request.tasteRating(), request.amountRating(), request.valueRating(), request.comment(), photos);
-        recomputeMenuStats(review.getMenu().getId());
+        Long menuId = review.getMenu().getId();
+        recomputeMenuStats(menuId);
         BadgeTier tier = BadgeTier.of(reviewRepository.countByUserId(userId));
-        return toResponse(review, userId, tier);
+        return toResponse(loadReviewForResponse(reviewId), userId, tier);
     }
 
     private Map<Long, Long> batchCountByUserIds(Set<Long> userIds) {
@@ -135,6 +136,11 @@ public class ReviewService {
         MenuStatAgg agg = reviewRepository.aggregateByMenuId(menuId);
         Double avgOverall = agg.avgT() == null ? null : (agg.avgT() + agg.avgA() + agg.avgV()) / 3.0;
         menuRepository.updateStats(menuId, agg.avgT(), agg.avgA(), agg.avgV(), avgOverall, agg.count());
+    }
+
+    private Review loadReviewForResponse(Long reviewId) {
+        return reviewRepository.findByIdWithUserAndMenu(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("리뷰를 찾을 수 없습니다"));
     }
 
     private ReviewResponse toResponse(Review review, Long currentUserId, BadgeTier authorBadgeTier) {

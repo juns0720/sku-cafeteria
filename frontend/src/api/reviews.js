@@ -10,7 +10,7 @@ export const createReview = (menuId, { tasteRating, amountRating, valueRating, c
   client.post('/reviews', { menuId, tasteRating, amountRating, valueRating, comment, photoUrls }).then(r => r.data);
 
 export const updateReview = (reviewId, { tasteRating, amountRating, valueRating, comment, photoUrls = [] }) =>
-  client.put(`/reviews/${reviewId}`, { tasteRating, amountRating, valueRating, comment, photoUrls });
+  client.put(`/reviews/${reviewId}`, { tasteRating, amountRating, valueRating, comment, photoUrls }).then(r => r.data);
 
 export const deleteReview = (reviewId) =>
   client.delete(`/reviews/${reviewId}`);

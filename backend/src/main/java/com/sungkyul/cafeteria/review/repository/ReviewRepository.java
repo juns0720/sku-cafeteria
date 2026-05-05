@@ -32,6 +32,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /** 사용자 + 메뉴 조합으로 단건 조회 (수정/삭제 시 소유권 확인) */
     Optional<Review> findByUserIdAndMenuId(Long userId, Long menuId);
 
+    @Query("""
+            SELECT r FROM Review r
+            JOIN FETCH r.user
+            JOIN FETCH r.menu
+            WHERE r.id = :reviewId
+            """)
+    Optional<Review> findByIdWithUserAndMenu(@Param("reviewId") Long reviewId);
+
     /** 1인 1메뉴 1리뷰 중복 작성 여부 확인 */
     boolean existsByUserIdAndMenuId(Long userId, Long menuId);
 

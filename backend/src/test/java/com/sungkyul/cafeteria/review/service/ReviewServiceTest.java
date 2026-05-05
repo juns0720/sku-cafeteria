@@ -4,6 +4,7 @@ import com.sungkyul.cafeteria.menu.entity.Menu;
 import com.sungkyul.cafeteria.menu.repository.MenuRepository;
 import com.sungkyul.cafeteria.review.dto.ReviewRequest;
 import com.sungkyul.cafeteria.review.dto.ReviewResponse;
+import com.sungkyul.cafeteria.review.dto.ReviewUpdateRequest;
 import com.sungkyul.cafeteria.review.entity.Review;
 import com.sungkyul.cafeteria.review.repository.MenuStatAgg;
 import com.sungkyul.cafeteria.review.repository.ReviewRepository;
@@ -12,6 +13,7 @@ import com.sungkyul.cafeteria.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.inOrder;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -36,13 +39,24 @@ class ReviewServiceTest {
     void createReview_성공_3축_저장() {
         Menu menu = Menu.builder().id(1L).name("김치찌개").corner("한식").build();
         User user = User.builder().id(10L).nickname("테스터").profileImage(null).build();
+        Review savedReview = Review.builder()
+                .id(100L)
+                .user(user)
+                .menu(menu)
+                .tasteRating(5)
+                .amountRating(4)
+                .valueRating(3)
+                .comment("맛있어요")
+                .photoUrls(new String[0])
+                .build();
 
         given(menuRepository.findById(1L)).willReturn(Optional.of(menu));
         given(reviewRepository.existsByUserIdAndMenuId(10L, 1L)).willReturn(false);
         given(userRepository.getReferenceById(10L)).willReturn(user);
-        given(reviewRepository.save(any())).willAnswer(inv -> inv.getArgument(0));
+        given(reviewRepository.save(any())).willReturn(savedReview);
         given(reviewRepository.aggregateByMenuId(1L)).willReturn(new MenuStatAgg(5.0, 4.0, 3.0, 1L));
         given(reviewRepository.countByUserId(10L)).willReturn(1L);
+        given(reviewRepository.findByIdWithUserAndMenu(100L)).willReturn(Optional.of(savedReview));
 
         ReviewRequest request = new ReviewRequest(1L, 5, 4, 3, "맛있어요", null);
         ReviewResponse response = reviewService.createReview(10L, request);
@@ -71,12 +85,23 @@ class ReviewServiceTest {
     void createReview_집계캐시_갱신() {
         Menu menu = Menu.builder().id(1L).name("김치찌개").corner("한식").build();
         User user = User.builder().id(10L).nickname("테스터").profileImage(null).build();
+        Review savedReview = Review.builder()
+                .id(100L)
+                .user(user)
+                .menu(menu)
+                .tasteRating(5)
+                .amountRating(4)
+                .valueRating(3)
+                .comment("맛있어요")
+                .photoUrls(new String[0])
+                .build();
 
         given(menuRepository.findById(1L)).willReturn(Optional.of(menu));
         given(reviewRepository.existsByUserIdAndMenuId(10L, 1L)).willReturn(false);
         given(userRepository.getReferenceById(10L)).willReturn(user);
-        given(reviewRepository.save(any())).willAnswer(inv -> inv.getArgument(0));
+        given(reviewRepository.save(any())).willReturn(savedReview);
         given(reviewRepository.aggregateByMenuId(1L)).willReturn(new MenuStatAgg(5.0, 4.0, 3.0, 1L));
+        given(reviewRepository.findByIdWithUserAndMenu(100L)).willReturn(Optional.of(savedReview));
 
         reviewService.createReview(10L, new ReviewRequest(1L, 5, 4, 3, "맛있어요", null));
 
@@ -96,6 +121,45 @@ class ReviewServiceTest {
     }
 
     @Test
+    void updateReview_성공_집계후_fetchJoin응답조회() {
+        User author = User.builder().id(10L).nickname("테스터").profileImage(null).build();
+        Menu menu = Menu.builder().id(1L).name("김치찌개").corner("한식").build();
+        Review review = Review.builder()
+                .id(100L)
+                .user(author)
+                .menu(menu)
+                .tasteRating(2)
+                .amountRating(3)
+                .valueRating(4)
+                .comment("이전")
+                .photoUrls(new String[0])
+                .build();
+
+        given(reviewRepository.findById(100L)).willReturn(Optional.of(review));
+        given(reviewRepository.aggregateByMenuId(1L)).willReturn(new MenuStatAgg(5.0, 4.0, 3.0, 1L));
+        given(reviewRepository.countByUserId(10L)).willReturn(1L);
+        given(reviewRepository.findByIdWithUserAndMenu(100L)).willReturn(Optional.of(review));
+
+        ReviewResponse response = reviewService.updateReview(
+                10L,
+                100L,
+                new ReviewUpdateRequest(5, 4, 3, "수정", null)
+        );
+
+        assertThat(response.menuName()).isEqualTo("김치찌개");
+        assertThat(response.userNickname()).isEqualTo("테스터");
+        assertThat(response.taste()).isEqualTo(5);
+        assertThat(response.amount()).isEqualTo(4);
+        assertThat(response.value()).isEqualTo(3);
+        assertThat(response.comment()).isEqualTo("수정");
+
+        InOrder inOrder = inOrder(menuRepository, reviewRepository);
+        inOrder.verify(menuRepository)
+                .updateStats(1L, 5.0, 4.0, 3.0, (5.0 + 4.0 + 3.0) / 3.0, 1L);
+        inOrder.verify(reviewRepository).findByIdWithUserAndMenu(100L);
+    }
+
+    @Test
     void updateReview_타인리뷰수정시_접근거부예외() {
         User author = User.builder().id(10L).build();
         Menu menu = Menu.builder().id(1L).name("김치찌개").corner("한식").build();
@@ -104,7 +168,7 @@ class ReviewServiceTest {
         given(reviewRepository.findById(100L)).willReturn(Optional.of(review));
 
         assertThatThrownBy(() -> reviewService.updateReview(20L, 100L,
-                new com.sungkyul.cafeteria.review.dto.ReviewUpdateRequest(5, 4, 3, "수정", null)))
+                new ReviewUpdateRequest(5, 4, 3, "수정", null)))
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessage("리뷰 수정 권한이 없습니다");
     }
