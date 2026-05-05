@@ -87,7 +87,7 @@
 - [x] **FE-T3**: `index.html` preconnect 힌트 추가 (Pretendard CDN)
 
 ### E-4 PWA
-- [ ] **PWA-T1**: PWA 설정 — `vite-plugin-pwa` 설치 + manifest(이름: 성결 학식, 테마: #FF6B5C) + 아이콘(192/512 PNG) + Service Worker(정적 에셋 Cache First, API Network Only).
+- [x] **PWA-T1**: PWA 설정 — `vite-plugin-pwa` 설치 + manifest(이름: 성결 학식, 테마: #FF6B5C) + 아이콘(192/512 PNG) + Service Worker(정적 에셋 Cache First, API Network Only).
 
 ---
 
