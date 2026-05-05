@@ -106,7 +106,6 @@
 - FE는 브라우저 **375 / 768 / 1280** 뷰포트에서 눈으로 확인
 - BE는 단위 테스트 + Postman 스모크 (이번 Phase는 V11 외 BE 변경 거의 없음)
 - `position: fixed` UI는 `createPortal(…, document.body)` 사용 (stacking context 우회)
-- `git commit` / `git push`는 사용자가 직접 진행 (Claude는 커밋하지 않음)
 - 새 컴포넌트는 `frontend/src/components/coral/` 하위에 둔다 (hi/는 v3-3에서 일괄 삭제)
 
 ---
