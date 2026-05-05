@@ -14,10 +14,20 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     /** 특정 메뉴의 리뷰 목록 (페이징, 최신순 정렬은 호출 측에서 Pageable로 지정) */
-    Page<Review> findByMenuId(Long menuId, Pageable pageable);
+    @Query(
+            value = "SELECT r FROM Review r JOIN FETCH r.user WHERE r.menu.id = :menuId",
+            countQuery = "SELECT COUNT(r) FROM Review r WHERE r.menu.id = :menuId"
+    )
+    Page<Review> findByMenuIdWithUser(@Param("menuId") Long menuId, Pageable pageable);
 
     /** 특정 사용자가 작성한 전체 리뷰 목록 (마이페이지) */
-    List<Review> findByUserIdOrderByCreatedAtDesc(Long userId);
+    @Query("""
+            SELECT r FROM Review r
+            JOIN FETCH r.menu
+            WHERE r.user.id = :userId
+            ORDER BY r.createdAt DESC
+            """)
+    List<Review> findByUserIdWithMenuOrderByCreatedAtDesc(@Param("userId") Long userId);
 
     /** 사용자 + 메뉴 조합으로 단건 조회 (수정/삭제 시 소유권 확인) */
     Optional<Review> findByUserIdAndMenuId(Long userId, Long menuId);

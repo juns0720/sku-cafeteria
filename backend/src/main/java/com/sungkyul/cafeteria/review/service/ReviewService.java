@@ -37,7 +37,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public Page<ReviewResponse> getReviews(Long menuId, int page, int size, Long currentUserId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Review> reviewPage = reviewRepository.findByMenuId(menuId, pageable);
+        Page<Review> reviewPage = reviewRepository.findByMenuIdWithUser(menuId, pageable);
 
         Set<Long> userIds = reviewPage.getContent().stream()
                 .map(r -> r.getUser().getId())
@@ -80,7 +80,7 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public List<ReviewResponse> getMyReviews(Long userId) {
-        List<Review> reviews = reviewRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Review> reviews = reviewRepository.findByUserIdWithMenuOrderByCreatedAtDesc(userId);
         BadgeTier tier = BadgeTier.of(reviews.size());
         return reviews.stream()
                 .map(review -> toResponse(review, userId, tier))
