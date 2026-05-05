@@ -207,6 +207,7 @@ export default function MenuDetailPage() {
     queryFn: () => getMenuById(menuId),
     enabled: isValidId,
     staleTime: MENU_STALE_TIME,
+    refetchOnWindowFocus: false,
   })
 
   const { data: reviewPage, isLoading: isReviewsLoading, isError: isReviewsError } = useQuery({

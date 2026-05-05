@@ -112,7 +112,7 @@
 - [x] **PERF-R11**: `.github/workflows/keep-alive.yml` 갱신 — `BACKEND_URL` 기본값 `sku-cafeteria-n.onrender.com`으로 교정 + `/api/warmup` 호출 추가(`/api/ping-db`는 유지). 둘 다 `curl -fsS -m 30 || true`
 - [x] **PERF-R15**: 검증 명령어 문서화 — `05-phase-e-performance.md`에 E-6 섹션 추가. curl 상세 시간 측정(PowerShell 변형 포함) · `X-Response-Time` 헤더 확인 · before/after 표 양식
 - [x] **PERF-R13**: Flyway V19 — `idx_reviews_user_created_at (user_id, created_at DESC)` 복합 인덱스. `/reviews/me` 풀스캔 방지
-- [ ] **PERF-R12**: 메뉴/홈 query에 한해 `refetchOnWindowFocus: false` — `HomePage`/`WeeklyPage`/`AllMenusPage`/`MenuDetailPage`(메뉴 부분만)/`ReviewWritePage`(메뉴 부분만). 리뷰·인증 query는 default(true) 유지
+- [x] **PERF-R12**: 메뉴/홈 query에 한해 `refetchOnWindowFocus: false` — `HomePage`/`WeeklyPage`/`AllMenusPage`/`MenuDetailPage`(메뉴 부분만)/`ReviewWritePage`(메뉴 부분만). 리뷰·인증 query는 default(true) 유지
 
 #### E-6 보류 결정 (이번 라운드 제외)
 

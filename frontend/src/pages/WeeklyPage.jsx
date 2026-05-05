@@ -147,6 +147,7 @@ export default function WeeklyPage() {
     queryKey: ['menus', 'weekly', dateKey],
     queryFn: () => getWeeklyMenus(dateKey),
     staleTime: MENU_STALE_TIME,
+    refetchOnWindowFocus: false,
   })
 
   // 서버가 weekStart를 반환하면 우선 사용, 없으면 클라이언트 계산값

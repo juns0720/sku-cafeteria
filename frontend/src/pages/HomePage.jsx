@@ -90,6 +90,7 @@ export default function HomePage() {
     queryKey: ['home', TODAY_SLOT],
     queryFn: () => getHome({ slot: TODAY_SLOT }),
     staleTime: MENU_STALE_TIME,
+    refetchOnWindowFocus: false,
   })
 
   const todayData = homeData?.today

@@ -107,6 +107,7 @@ export default function ReviewWritePage() {
     queryFn: () => getMenuById(menuId),
     enabled: isValidId,
     staleTime: MENU_STALE_TIME,
+    refetchOnWindowFocus: false,
   })
 
   const {

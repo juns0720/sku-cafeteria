@@ -122,11 +122,13 @@ export default function AllMenusPage() {
     queryKey: ['menus', 'all', { corner: selectedCorner ?? 'ALL', sort, scope: 'all' }],
     queryFn: () => getAllMenus({ corner: selectedCorner, sort, scope: 'all' }),
     staleTime: MENU_STALE_TIME,
+    refetchOnWindowFocus: false,
   })
   const { data: cornersData = [] } = useQuery({
     queryKey: ['menus', 'corners'],
     queryFn: getCorners,
     staleTime: MENU_STALE_TIME,
+    refetchOnWindowFocus: false,
   })
 
   const cornerList = ['전체', ...cornersData]
