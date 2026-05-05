@@ -40,7 +40,7 @@
 
 | 메서드 | 경로 | 인증 | 설명 |
 |---|---|---|---|
-| GET | `/menus?sort=&scope=&corner=` | 불필요 | 전체 메뉴 목록 |
+| GET | `/menus?sort=&scope=&corner=` | 불필요 | 전체 메뉴 목록. `Cache-Control: public, max-age=30` |
 | GET | `/menus/today?slot=LUNCH` | 불필요 | 오늘 학식 (slot 파라미터, 기본 LUNCH) |
 | GET | `/menus/weekly?date=yyyy-MM-dd` | 불필요 | 해당 주 월~금 식단 |
 | GET | `/menus/{menuId}` | 불필요 | 메뉴 단건 상세 (없으면 404) |
