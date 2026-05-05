@@ -100,7 +100,7 @@
 - [x] **PERF-R5**: `GET /api/v1/menus` 30초 Cache-Control 적용 — 5분 확대는 계측 후 결정
 - [x] **PERF-R6**: Spring response compression 적용 — JSON gzip 활성화
 - [x] **PERF-R7**: Supabase `pg_stat_statements` 확인 — 실행 SQL/기록 양식 추가, 운영 결과는 배포 후 기록
-- [ ] **PERF-R8**: `reviews(menu_id, created_at DESC)` 복합 인덱스 필요성 판단 — 필요 시 Flyway 추가
+- [x] **PERF-R8**: `reviews(menu_id, created_at DESC)` 복합 인덱스 필요성 판단 — Flyway V18 추가
 - [ ] **PERF-R9**: 홈 초기 API 수 확인 — 병목 확인 시에만 `GET /api/v1/home` 설계/구현
 
 ---

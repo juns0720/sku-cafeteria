@@ -722,6 +722,8 @@ CREATE INDEX IF NOT EXISTS idx_reviews_menu_created_at
     ON reviews (menu_id, created_at DESC);
 ```
 
+적용 파일: `backend/src/main/resources/db/migration/V18__add_reviews_menu_created_at_index.sql`
+
 단일 인덱스 제거는 이번 범위에서 하지 않는다. 운영 안정성을 위해 먼저 복합 인덱스 추가 후 중복 인덱스 정리는 별도 후속으로 둔다.
 
 ---
