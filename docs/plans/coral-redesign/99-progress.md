@@ -77,7 +77,7 @@
 ### E-2 DB 성능 최적화
 - [x] **DB-T1**: Flyway V17 — `reviews.menu_id` 인덱스 추가 (풀 스캔 방지)
 - [x] **DB-T2**: `getReviews()` N+1 제거 — `ReviewRepository`에 `JOIN FETCH r.user` @Query 추가
-- [ ] **DB-T3**: `recomputeMenuStats()` 최적화 — `MenuRepository`에 @Modifying UPDATE 추가, `findById` 제거
+- [x] **DB-T3**: `recomputeMenuStats()` 최적화 — `MenuRepository`에 @Modifying UPDATE 추가, `findById` 제거
 - [ ] **DB-T4**: HikariCP 커넥션 풀 설정 + `RestTemplate` timeout 설정
 
 ### E-3 프론트엔드 성능

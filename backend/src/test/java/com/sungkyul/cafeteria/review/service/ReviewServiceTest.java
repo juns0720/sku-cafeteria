@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -79,8 +80,8 @@ class ReviewServiceTest {
 
         reviewService.createReview(10L, new ReviewRequest(1L, 5, 4, 3, "맛있어요", null));
 
-        assertThat(menu.getAvgOverall()).isEqualTo((5.0 + 4.0 + 3.0) / 3.0);
-        assertThat(menu.getReviewCount()).isEqualTo(1);
+        then(menuRepository).should()
+                .updateStats(1L, 5.0, 4.0, 3.0, (5.0 + 4.0 + 3.0) / 3.0, 1L);
     }
 
     @Test

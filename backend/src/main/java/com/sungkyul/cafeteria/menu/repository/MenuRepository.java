@@ -4,6 +4,7 @@ import com.sungkyul.cafeteria.menu.dto.MenuAggregateProjection;
 import com.sungkyul.cafeteria.menu.entity.Menu;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -70,4 +71,24 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     /** 존재하는 코너 목록 (FE CornerTabs 용) */
     @Query("SELECT DISTINCT m.corner FROM Menu m ORDER BY m.corner")
     List<String> findDistinctCorners();
+
+    /** 집계 캐시 직접 UPDATE — findById + dirty-check 대체 */
+    @Modifying(clearAutomatically = true)
+    @Query("""
+        UPDATE Menu m SET
+            m.avgTaste = :avgTaste,
+            m.avgAmount = :avgAmount,
+            m.avgValue = :avgValue,
+            m.avgOverall = :avgOverall,
+            m.reviewCount = :reviewCount
+        WHERE m.id = :menuId
+    """)
+    int updateStats(
+            @Param("menuId") Long menuId,
+            @Param("avgTaste") Double avgTaste,
+            @Param("avgAmount") Double avgAmount,
+            @Param("avgValue") Double avgValue,
+            @Param("avgOverall") Double avgOverall,
+            @Param("reviewCount") long reviewCount
+    );
 }

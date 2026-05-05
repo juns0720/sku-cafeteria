@@ -133,8 +133,8 @@ public class ReviewService {
 
     private void recomputeMenuStats(Long menuId) {
         MenuStatAgg agg = reviewRepository.aggregateByMenuId(menuId);
-        Menu menu = menuRepository.findById(menuId).orElseThrow();
-        menu.applyStats(agg.avgT(), agg.avgA(), agg.avgV(), agg.count());
+        Double avgOverall = agg.avgT() == null ? null : (agg.avgT() + agg.avgA() + agg.avgV()) / 3.0;
+        menuRepository.updateStats(menuId, agg.avgT(), agg.avgA(), agg.avgV(), avgOverall, agg.count());
     }
 
     private ReviewResponse toResponse(Review review, Long currentUserId, BadgeTier authorBadgeTier) {
