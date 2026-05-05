@@ -6,6 +6,7 @@ import BestRow from '../components/coral/BestRow'
 import Empty from '../components/coral/Empty'
 import Icon from '../components/coral/Icon'
 import Thumb from '../components/coral/Thumb'
+import { MENU_STALE_TIME } from '../lib/queryTimes'
 
 const DAY_KO = ['일', '월', '화', '수', '목', '금', '토']
 const TODAY_SLOT = 'LUNCH'
@@ -88,10 +89,12 @@ export default function HomePage() {
   const { data: todayData, isLoading: isTodayLoading, isError: isTodayError } = useQuery({
     queryKey: ['menus', 'today', TODAY_SLOT],
     queryFn: () => getTodayMenus(TODAY_SLOT),
+    staleTime: MENU_STALE_TIME,
   })
   const { data: bestMenus = [], isLoading: isBestLoading } = useQuery({
     queryKey: ['menus', 'best'],
     queryFn: getBestMenus,
+    staleTime: MENU_STALE_TIME,
   })
 
   const todayMenus = sortMenus(todayData?.menus ?? [], sort)
