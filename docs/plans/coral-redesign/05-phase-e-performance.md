@@ -732,25 +732,24 @@ CREATE INDEX IF NOT EXISTS idx_reviews_menu_created_at
 
 **목표**: 초기 화면의 API 왕복 수가 실제 병목일 때만 `GET /api/v1/home`을 만든다.
 
-**현재 상태**:
-- `HomePage`는 `today`, `best` 2개 API를 병렬 호출한다.
-- `auth/me`는 앱 전역 `useAuth`에서 호출된다.
+**적용 결과**:
+- `HomePage`의 홈 데이터 API를 `GET /api/v1/home`으로 통합한다.
+- 응답은 `today`와 `bestMenus`만 포함한다.
+- `auth/me`는 닉네임 모달/인증 상태와 연결된 사용자별 응답이므로 기존 `useAuth` 흐름에 남긴다.
 
-### 즉시 구현하지 않는 이유
+### 구현 파일
 
-- 현재 홈 데이터 API는 2개이고 React Query가 병렬 실행한다.
-- 통합 API는 DTO와 캐시 무효화 범위가 커지므로, 왕복 수가 실제 병목일 때만 이득이 명확하다.
+- `backend/src/main/java/com/sungkyul/cafeteria/home/controller/HomeController.java`
+- `backend/src/main/java/com/sungkyul/cafeteria/home/service/HomeService.java`
+- `backend/src/main/java/com/sungkyul/cafeteria/home/dto/HomeResponse.java`
+- `frontend/src/api/home.js`
+- `frontend/src/pages/HomePage.jsx`
 
-### 도입 조건
-
-- 초기 진입 API가 3개 이상 반복 발생
-- `X-Response-Time-ms`는 짧지만 브라우저 total/TTFB 합산이 큼
-- 홈 화면에 필요한 데이터가 `todayMenus`, `bestMenus`, 최소 `me` 정도로 제한됨
-
-### 도입 시 원칙
+### 응답 원칙
 
 - `GET /api/v1/home`은 홈 화면 전용 DTO만 반환한다.
 - 리뷰 목록, 대용량 통계, 사용자 민감 정보는 포함하지 않는다.
+- public menu 데이터 조합이므로 30초 public cache를 적용한다.
 
 ---
 
@@ -770,5 +769,5 @@ CREATE INDEX IF NOT EXISTS idx_reviews_menu_created_at
   PERF-R7 → PERF-R8
 
 5단계 — 조건부 구조 변경
-  PERF-R9는 초기 API 왕복 수가 병목으로 확인될 때만 진행
+  PERF-R9 → HomePage today/best API를 /api/v1/home으로 통합
 ```

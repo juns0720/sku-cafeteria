@@ -24,6 +24,10 @@ com.sungkyul.cafeteria
 │   └── service/AuthService.java
 ├── admin/
 │   └── controller/AdminController.java  # POST /api/v1/admin/crawl, /admin/crawl/debug
+├── home/
+│   ├── controller/HomeController.java   # GET /api/v1/home
+│   ├── dto/HomeResponse.java            # today + bestMenus
+│   └── service/HomeService.java         # 홈 초기 데이터 조합
 ├── cron/
 │   └── controller/CronController.java   # (예정: P2-T13) POST /api/cron/crawl + X-Cron-Secret
 ├── crawler/
@@ -82,6 +86,7 @@ Long userId = (Long) authentication.getPrincipal();
 | `/api/v1/auth/google` | POST | permitAll |
 | `/api/ping-db` | GET | permitAll |
 | `/api/v1/health` | GET | permitAll |
+| `/api/v1/home` | GET | permitAll |
 | `/api/v1/menus/**` | GET | permitAll |
 | `/api/v1/reviews/**` | GET | permitAll |
 | `/api/cron/**` | POST | permitAll (헤더 검증은 컨트롤러에서) |

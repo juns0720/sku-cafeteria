@@ -47,6 +47,21 @@
 | GET | `/menus/best` | 불필요 | 이번 주 BEST TOP 5 (예정: P2-T7) |
 | GET | `/menus/corners` | 불필요 | 코너 목록 |
 
+---
+
+## Home
+
+| 메서드 | 경로 | 인증 | 설명 |
+|---|---|---|---|
+| GET | `/home?slot=LUNCH` | 불필요 | 홈 화면 초기 데이터. `today` + `bestMenus`, `Cache-Control: public, max-age=30` |
+
+### `HomeResponse` 필드
+
+| 필드 | 타입 | 비고 |
+|---|---|---|
+| `today` | TodayMenuResponse | `/menus/today`와 동일한 구조 |
+| `bestMenus` | MenuResponse[] | `/menus/best`와 동일한 구조 |
+
 ### `/menus` 쿼리 파라미터
 
 - `sort`: `rating`(평균↓) / `reviewCount`(↓) / `date`(↓, 기본)

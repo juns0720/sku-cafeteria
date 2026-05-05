@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { getBestMenus, getTodayMenus } from '../api/menus'
+import { getHome } from '../api/home'
 import BestRow from '../components/coral/BestRow'
 import Empty from '../components/coral/Empty'
 import Icon from '../components/coral/Icon'
@@ -86,19 +86,16 @@ export default function HomePage() {
   const navigate = useNavigate()
   const [sort, setSort] = useState('rating')
 
-  const { data: todayData, isLoading: isTodayLoading, isError: isTodayError } = useQuery({
-    queryKey: ['menus', 'today', TODAY_SLOT],
-    queryFn: () => getTodayMenus(TODAY_SLOT),
-    staleTime: MENU_STALE_TIME,
-  })
-  const { data: bestMenus = [], isLoading: isBestLoading } = useQuery({
-    queryKey: ['menus', 'best'],
-    queryFn: getBestMenus,
+  const { data: homeData, isLoading: isHomeLoading, isError: isHomeError } = useQuery({
+    queryKey: ['home', TODAY_SLOT],
+    queryFn: () => getHome({ slot: TODAY_SLOT }),
     staleTime: MENU_STALE_TIME,
   })
 
+  const todayData = homeData?.today
+  const bestMenus = homeData?.bestMenus ?? []
   const todayMenus = sortMenus(todayData?.menus ?? [], sort)
-  const hasBest = !isBestLoading && bestMenus.length > 0
+  const hasBest = !isHomeLoading && bestMenus.length > 0
 
   return (
     <div className="animate-fadeInUp">
@@ -113,7 +110,7 @@ export default function HomePage() {
         <div className="px-6 pb-3 flex items-baseline justify-between">
           <div className="text-[18px] font-extrabold tracking-[-0.4px] text-g900">
             이번 주 베스트{' '}
-            {!isBestLoading && bestMenus.length > 0 && (
+            {!isHomeLoading && bestMenus.length > 0 && (
               <span className="text-coral">{Math.min(bestMenus.length, 5)}</span>
             )}
           </div>
@@ -126,8 +123,12 @@ export default function HomePage() {
           </button>
         </div>
 
-        {isBestLoading ? (
+        {isHomeLoading ? (
           <BestSkeleton />
+        ) : isHomeError ? (
+          <div className="px-6 pb-[22px] text-[13px] text-g500">
+            베스트 메뉴를 불러오지 못했어요
+          </div>
         ) : hasBest ? (
           <BestRow items={bestMenus.slice(0, 5)} onItemClick={(id) => navigate(`/menus/${id}`)} />
         ) : (
@@ -144,9 +145,9 @@ export default function HomePage() {
           <SortDropdown value={sort} onChange={setSort} />
         </div>
 
-        {isTodayLoading ? (
+        {isHomeLoading ? (
           <MenuSkeleton />
-        ) : isTodayError ? (
+        ) : isHomeError ? (
           <Empty
             icon="soup"
             title="메뉴를 불러오지 못했습니다"
