@@ -75,7 +75,7 @@
 - [x] **BUG-T1**: 닉네임 쿨다운 UX 개선 — `ProfilePage`에서 `nicknameChangedAt` 기반 잠금 + "N일 후 변경 가능" 표시. `NicknameSetupModal` `nextChangeAt` 문구 추가. BE 로직은 정상.
 
 ### E-2 DB 성능 최적화
-- [ ] **DB-T1**: Flyway V17 — `reviews.menu_id` 인덱스 추가 (풀 스캔 방지)
+- [x] **DB-T1**: Flyway V17 — `reviews.menu_id` 인덱스 추가 (풀 스캔 방지)
 - [ ] **DB-T2**: `getReviews()` N+1 제거 — `ReviewRepository`에 `JOIN FETCH r.user` @Query 추가
 - [ ] **DB-T3**: `recomputeMenuStats()` 최적화 — `MenuRepository`에 @Modifying UPDATE 추가, `findById` 제거
 - [ ] **DB-T4**: HikariCP 커넥션 풀 설정 + `RestTemplate` timeout 설정
