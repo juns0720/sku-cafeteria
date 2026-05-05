@@ -94,7 +94,7 @@
 상세 설계: [`05-phase-e-performance.md`](./05-phase-e-performance.md#phase-e-5--rendersupabase-후속-성능-계측)
 
 - [x] **PERF-R1**: `RequestTimingFilter` 추가 — 모든 API에 `X-Response-Time-ms` 헤더와 `[REQ]` elapsed 로그 추가
-- [x] **PERF-R2**: DB warm keep-alive — `GET /api/ping-db` 추가 + keep-alive 대상 변경
+- [x] **PERF-R2**: DB warm keep-alive — `GET /api/v1/ping-db` 추가 + keep-alive 대상 변경
 - [x] **PERF-R3**: HikariCP prod 재조정 — `maximum-pool-size: 3`, `minimum-idle: 1`, 짧은 connection timeout, keepalive 적용
 - [x] **PERF-R4**: React Query/axios 정책 조정 — axios timeout 8초, query retry 1, mutation retry 0, 메뉴/리뷰 staleTime 분리
 - [x] **PERF-R5**: `GET /api/v1/menus` 30초 Cache-Control 적용 — 5분 확대는 계측 후 결정
@@ -108,8 +108,8 @@
 상세 설계: `~/.claude/plans/perform-md-robust-wadler.md` (perform.md 기반 후속 분석·우선순위·단위 명세)
 
 - [x] **PERF-R14**: 운영 URL 검증 · stale 참조 정리 — Vercel `VITE_API_BASE_URL` 확인 + `CLAUDE.md` Project Overview · `frontend/vite.config.js` PWA urlPattern을 `sku-cafeteria-n.onrender.com`으로 교체. 브라우저 Network 탭으로 실제 호출 도메인 검증
-- [x] **PERF-R10**: `/api/warmup` 엔드포인트 추가 — `WarmupController`(common) 신설. `select 1` + `getTodayMenus(LUNCH)` + `getBestOfWeek()` + 최근 리뷰 10건. 단계별 try/catch로 fail-soft, 응답에 `elapsedMs` 포함. `SecurityConfig`에 `permitAll`
-- [x] **PERF-R11**: `.github/workflows/keep-alive.yml` 갱신 — `BACKEND_URL` 기본값 `sku-cafeteria-n.onrender.com`으로 교정 + `/api/warmup` 호출 추가(`/api/ping-db`는 유지). 둘 다 `curl -fsS -m 30 || true`
+- [x] **PERF-R10**: `/api/v1/warmup` 엔드포인트 추가 — `WarmupController`(common) 신설. `select 1` + `getTodayMenus(LUNCH)` + `getBestOfWeek()` + 최근 리뷰 10건. 단계별 try/catch로 fail-soft, 응답에 `elapsedMs` 포함. `SecurityConfig`에 `permitAll`
+- [x] **PERF-R11**: `.github/workflows/keep-alive.yml` 갱신 — `BACKEND_URL` 기본값 `sku-cafeteria-n.onrender.com`으로 교정 + `/api/v1/warmup` 호출 추가(`/api/v1/ping-db`는 유지). 둘 다 `curl -fsS -m 30 || true`
 - [x] **PERF-R15**: 검증 명령어 문서화 — `05-phase-e-performance.md`에 E-6 섹션 추가. curl 상세 시간 측정(PowerShell 변형 포함) · `X-Response-Time` 헤더 확인 · before/after 표 양식
 - [x] **PERF-R13**: Flyway V19 — `idx_reviews_user_created_at (user_id, created_at DESC)` 복합 인덱스. `/reviews/me` 풀스캔 방지
 - [x] **PERF-R12**: 메뉴/홈 query에 한해 `refetchOnWindowFocus: false` — `HomePage`/`WeeklyPage`/`AllMenusPage`/`MenuDetailPage`(메뉴 부분만)/`ReviewWritePage`(메뉴 부분만). 리뷰·인증 query는 default(true) 유지

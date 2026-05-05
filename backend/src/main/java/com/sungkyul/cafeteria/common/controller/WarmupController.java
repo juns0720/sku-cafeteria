@@ -18,7 +18,7 @@ import java.util.Map;
  * keep-alive cron이 10분 간격으로 호출하는 것을 전제로 한다. 단계별 try/catch로 fail-soft.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class WarmupController {
 

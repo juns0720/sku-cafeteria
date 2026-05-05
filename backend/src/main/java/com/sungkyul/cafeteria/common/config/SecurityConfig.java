@@ -39,8 +39,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/google").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/ping-db").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/warmup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/ping-db").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/warmup").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/home").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/menus/**").permitAll()

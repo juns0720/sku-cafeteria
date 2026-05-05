@@ -517,7 +517,7 @@ curl -i -s https://<render-host>/api/v1/menus | grep -i "x-response-time"
 
 ---
 
-## PERF-R2 · `/api/ping-db` keep-alive
+## PERF-R2 · `/api/v1/ping-db` keep-alive
 
 **목표**: Render 인스턴스뿐 아니라 DB connection까지 warm 상태에 가깝게 유지한다.
 
@@ -528,16 +528,16 @@ curl -i -s https://<render-host>/api/v1/menus | grep -i "x-response-time"
 
 ### 작업
 
-- `GET /api/ping-db`를 추가한다.
+- `GET /api/v1/ping-db`를 추가한다.
 - 내부에서는 `JdbcTemplate.queryForObject("select 1", Integer.class)`만 수행한다.
 - 응답은 `200 OK`와 `"ok"` 또는 `{ "status": "ok" }`처럼 비민감 정보만 반환한다.
-- `SecurityConfig`에서 `GET /api/ping-db`를 `permitAll`로 연다.
-- 기존 keep-alive가 `/api/v1/health`를 호출하고 있다면 `/api/ping-db`로 바꾼다.
+- `SecurityConfig`에서 `GET /api/v1/ping-db`를 `permitAll`로 연다.
+- 기존 keep-alive가 `/api/v1/health`를 호출하고 있다면 `/api/v1/ping-db`로 바꾼다.
 
 ### 검증
 
 ```bash
-curl -w "\nTOTAL: %{time_total}s\n" -o /dev/null -s https://<render-host>/api/ping-db
+curl -w "\nTOTAL: %{time_total}s\n" -o /dev/null -s https://<render-host>/api/v1/ping-db
 ```
 
 ---
@@ -568,7 +568,7 @@ spring:
 ### 검증
 
 - Render 로그에서 Hikari pool 초기화 오류가 없는지 확인
-- `/api/ping-db`, `/api/v1/menus`, `/api/v1/reviews?menuId=...` 반복 호출 시 connection timeout이 발생하지 않는지 확인
+- `/api/v1/ping-db`, `/api/v1/menus`, `/api/v1/reviews?menuId=...` 반복 호출 시 connection timeout이 발생하지 않는지 확인
 
 ---
 
@@ -779,28 +779,28 @@ CREATE INDEX IF NOT EXISTS idx_reviews_menu_created_at
 > 진행 상황: `99-progress.md` E-6 섹션.  
 > 상세 설계 근거: `~/.claude/plans/perform-md-robust-wadler.md`
 
-E-5에서 계측·압축·HikariCP·홈 통합을 완료한 뒤에도 "새로운 데이터 최초 로딩 지연"이 남아 있는 경우, Hibernate metadata·JIT-compiled 쿼리 plan이 첫 사용자 요청에서야 컴파일되는 cold-path 비용이 원인일 가능성이 높다. E-6는 이 문제를 `/api/warmup`으로 직접 해결하고, 운영 URL 정합 + 쿼리 최적화 후속으로 마무리한다.
+E-5에서 계측·압축·HikariCP·홈 통합을 완료한 뒤에도 "새로운 데이터 최초 로딩 지연"이 남아 있는 경우, Hibernate metadata·JIT-compiled 쿼리 plan이 첫 사용자 요청에서야 컴파일되는 cold-path 비용이 원인일 가능성이 높다. E-6는 이 문제를 `/api/v1/warmup`으로 직접 해결하고, 운영 URL 정합 + 쿼리 최적화 후속으로 마무리한다.
 
 ### 단위 목록
 
 | ID | 내용 | 상태 |
 |---|---|---|
 | PERF-R14 | 운영 URL stale 참조 정리 (CLAUDE.md / AGENTS.md / vite.config.js / render.yaml) | 완료 |
-| PERF-R10 | `/api/warmup` 엔드포인트 신설 — DB + 오늘 메뉴 + best + 최근 리뷰 10건 fail-soft | 완료 |
-| PERF-R11 | keep-alive.yml — URL 교정 + `/api/warmup` 호출 추가 | 완료 |
+| PERF-R10 | `/api/v1/warmup` 엔드포인트 신설 — DB + 오늘 메뉴 + best + 최근 리뷰 10건 fail-soft | 완료 |
+| PERF-R11 | keep-alive.yml — URL 교정 + `/api/v1/warmup` 호출 추가 | 완료 |
 | PERF-R15 | 검증 명령어 문서화 + before/after 측정 양식 | 완료 |
 | PERF-R13 | Flyway V19 — `reviews(user_id, created_at DESC)` 복합 인덱스 | 미완료 |
 | PERF-R12 | 메뉴/홈 query에 한해 `refetchOnWindowFocus: false` | 미완료 |
 
 ---
 
-## PERF-R10 · `/api/warmup`
+## PERF-R10 · `/api/v1/warmup`
 
 **목표**: keep-alive cron 호출 한 번으로 DB 커넥션(PERF-R2)에 더해 Hibernate metadata·JIT 쿼리 plan까지 사전에 데운다.
 
 **파일**:
 - `backend/src/main/java/com/sungkyul/cafeteria/common/controller/WarmupController.java` (신규)
-- `backend/src/main/java/com/sungkyul/cafeteria/common/config/SecurityConfig.java` (`/api/warmup` permitAll 추가)
+- `backend/src/main/java/com/sungkyul/cafeteria/common/config/SecurityConfig.java` (`/api/v1/warmup` permitAll 추가)
 - `backend/src/main/java/com/sungkyul/cafeteria/review/repository/ReviewRepository.java` (`findTop10ByOrderByCreatedAtDesc` 추가)
 
 **응답 예시**:
@@ -833,9 +833,9 @@ E-5에서 계측·압축·HikariCP·홈 통합을 완료한 뒤에도 "새로운
   run: |
     BACKEND_URL="${BACKEND_URL:-https://sku-cafeteria-n.onrender.com}"
     # ping-db: 인스턴스 깨우기 + DB 커넥션 keep-alive
-    curl -fsS -m 30 "$BACKEND_URL/api/ping-db" || true
+    curl -fsS -m 30 "$BACKEND_URL/api/v1/ping-db" || true
     # warmup: 오늘 메뉴 + best + 최근 리뷰를 미리 조회해 Hibernate metadata·쿼리 plan을 데움
-    curl -fsS -m 30 "$BACKEND_URL/api/warmup" || true
+    curl -fsS -m 30 "$BACKEND_URL/api/v1/warmup" || true
 ```
 
 역할 분리:
@@ -881,16 +881,16 @@ curl -i -s https://sku-cafeteria-n.onrender.com/api/v1/menus | grep -i "x-respon
 ### 3. warmup / ping-db 개별 응답 확인
 
 ```bash
-curl -i https://sku-cafeteria-n.onrender.com/api/warmup
-curl -i https://sku-cafeteria-n.onrender.com/api/ping-db
+curl -i https://sku-cafeteria-n.onrender.com/api/v1/warmup
+curl -i https://sku-cafeteria-n.onrender.com/api/v1/ping-db
 ```
 
 warmup 연속 호출로 cold vs warm 차이 측정:
 ```bash
 # 첫 번째 — cold 비용
-curl -s https://sku-cafeteria-n.onrender.com/api/warmup | python3 -m json.tool
+curl -s https://sku-cafeteria-n.onrender.com/api/v1/warmup | python3 -m json.tool
 # 즉시 두 번째 — warm 비용
-curl -s https://sku-cafeteria-n.onrender.com/api/warmup | python3 -m json.tool
+curl -s https://sku-cafeteria-n.onrender.com/api/v1/warmup | python3 -m json.tool
 ```
 
 `elapsedMs` 첫 호출 > 두 번째 호출이면 warmup이 쿼리 plan을 제대로 캐싱하고 있다는 신호.
@@ -899,7 +899,7 @@ curl -s https://sku-cafeteria-n.onrender.com/api/warmup | python3 -m json.tool
 
 Render 대시보드 → 해당 서비스 → Logs 탭 → 검색:
 ```
-[REQ] uri=/api/warmup
+[REQ] uri=/api/v1/warmup
 ```
 
 `elapsed` 분포를 몇 분 동안 관찰하면 cold-path 비용과 warm 상태를 구분할 수 있다.
