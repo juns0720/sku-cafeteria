@@ -8,6 +8,17 @@ const popupHeaders = {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-google': ['@react-oauth/google'],
+        },
+      },
+    },
+  },
   server: {
     headers: popupHeaders,
   },

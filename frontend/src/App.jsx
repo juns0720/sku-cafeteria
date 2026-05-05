@@ -1,19 +1,21 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { createPortal } from 'react-dom'
-import AllMenusPage from './pages/AllMenusPage'
-import DevComponentsPage from './pages/DevComponentsPage'
-import HomePage from './pages/HomePage'
-import LoginPage from './pages/LoginPage'
-import MenuDetailPage from './pages/MenuDetailPage'
-import ProfilePage from './pages/ProfilePage'
-import ReviewWritePage from './pages/ReviewWritePage'
-import WeeklyPage from './pages/WeeklyPage'
 import NicknameSetupModal from './components/coral/NicknameSetupModal'
 import Tab from './components/coral/Tab'
 import useAuth from './hooks/useAuth'
 import useToast from './hooks/useToast.jsx'
+
+const AllMenusPage = lazy(() => import('./pages/AllMenusPage'))
+const DevComponentsPage = lazy(() => import('./pages/DevComponentsPage'))
+const HomePage = lazy(() => import('./pages/HomePage'))
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const MenuDetailPage = lazy(() => import('./pages/MenuDetailPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const ReviewWritePage = lazy(() => import('./pages/ReviewWritePage'))
+const WeeklyPage = lazy(() => import('./pages/WeeklyPage'))
 
 
 
@@ -81,22 +83,24 @@ function AppInner() {
     <>
       {ToastComponent}
       <main className={`${showBottomNav ? 'pb-16' : 'pb-0'} max-w-[1100px] mx-auto w-full`}>
-        <Routes>
-          <Route
-            path="/login"
-            element={isLoggedIn ? <Navigate to="/" replace /> : <LoginPage onLoginSuccess={handleLoginSuccess} />}
-          />
-          <Route path="/" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" replace />} />
-          <Route path="/weekly" element={isLoggedIn ? <WeeklyPage /> : <Navigate to="/login" replace />} />
-          <Route path="/menus" element={isLoggedIn ? <AllMenusPage /> : <Navigate to="/login" replace />} />
-          <Route path="/menus/:id" element={isLoggedIn ? <MenuDetailPage /> : <Navigate to="/login" replace />} />
-          <Route path="/menus/:id/review" element={isLoggedIn ? <ReviewWritePage /> : <Navigate to="/login" replace />} />
-          <Route path="/profile" element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" replace />} />
-          <Route path="/reviews" element={<Navigate to={isLoggedIn ? '/menus' : '/login'} replace />} />
-          <Route path="/my-reviews" element={<Navigate to="/profile" replace />} />
-          <Route path="/dev/components" element={<DevComponentsPage />} />
-          <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} replace />} />
-        </Routes>
+        <Suspense fallback={<div className="min-h-screen bg-white" />}>
+          <Routes>
+            <Route
+              path="/login"
+              element={isLoggedIn ? <Navigate to="/" replace /> : <LoginPage onLoginSuccess={handleLoginSuccess} />}
+            />
+            <Route path="/" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" replace />} />
+            <Route path="/weekly" element={isLoggedIn ? <WeeklyPage /> : <Navigate to="/login" replace />} />
+            <Route path="/menus" element={isLoggedIn ? <AllMenusPage /> : <Navigate to="/login" replace />} />
+            <Route path="/menus/:id" element={isLoggedIn ? <MenuDetailPage /> : <Navigate to="/login" replace />} />
+            <Route path="/menus/:id/review" element={isLoggedIn ? <ReviewWritePage /> : <Navigate to="/login" replace />} />
+            <Route path="/profile" element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" replace />} />
+            <Route path="/reviews" element={<Navigate to={isLoggedIn ? '/menus' : '/login'} replace />} />
+            <Route path="/my-reviews" element={<Navigate to="/profile" replace />} />
+            <Route path="/dev/components" element={<DevComponentsPage />} />
+            <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} replace />} />
+          </Routes>
+        </Suspense>
       </main>
       {showBottomNav && <TabBarPortal current={activeTab} />}
       {isNicknameModalOpen && <NicknameSetupModal onClose={() => {}} />}
