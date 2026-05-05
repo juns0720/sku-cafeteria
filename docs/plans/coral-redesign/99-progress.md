@@ -72,7 +72,7 @@
 실행 명세: [`05-phase-e-performance.md`](./05-phase-e-performance.md)
 
 ### E-1 버그 수정
-- [ ] **BUG-T1**: 닉네임 쿨다운 UX 개선 — `ProfilePage`에서 `nicknameChangedAt` 기반 잠금 + "N일 후 변경 가능" 표시. `NicknameSetupModal` `nextChangeAt` 문구 추가. BE 로직은 정상.
+- [x] **BUG-T1**: 닉네임 쿨다운 UX 개선 — `ProfilePage`에서 `nicknameChangedAt` 기반 잠금 + "N일 후 변경 가능" 표시. `NicknameSetupModal` `nextChangeAt` 문구 추가. BE 로직은 정상.
 
 ### E-2 DB 성능 최적화
 - [ ] **DB-T1**: Flyway V17 — `reviews.menu_id` 인덱스 추가 (풀 스캔 방지)

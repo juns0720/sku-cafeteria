@@ -55,6 +55,15 @@ export default function ProfilePage() {
 
   if (!user) return <ProfileSkeleton />
 
+  const remainingDays = (() => {
+    if (!user?.nicknameChangedAt) return 0
+    const changedAt = new Date(user.nicknameChangedAt)
+    const unlockAt  = new Date(changedAt.getTime() + 30 * 24 * 60 * 60 * 1000)
+    const diff      = Math.ceil((unlockAt - Date.now()) / (1000 * 60 * 60 * 24))
+    return diff > 0 ? diff : 0
+  })()
+  const canChangeNickname = remainingDays === 0
+
   const badgeEmoji = BADGE_EMOJI[user.badgeTier] ?? ''
   const nextTierLabel = BADGE_NEXT_LABEL[user.badgeTier] ?? '🥇 골드'
   const isGold = user.badgeTier === 'GOLD'
@@ -85,8 +94,10 @@ export default function ProfilePage() {
           {/* 프로필 카드 */}
           <button
             type="button"
-            onClick={() => setIsNicknameEditOpen(true)}
-            className="w-full flex items-center gap-3.5 p-4 rounded-[18px] bg-g50 active:bg-g100 transition-colors text-left"
+            onClick={() => canChangeNickname && setIsNicknameEditOpen(true)}
+            className={`w-full flex items-center gap-3.5 p-4 rounded-[18px] bg-g50 transition-colors text-left ${
+              canChangeNickname ? 'active:bg-g100 cursor-pointer' : 'cursor-default'
+            }`}
           >
             <div
               className="w-[60px] h-[60px] rounded-full flex-shrink-0 flex items-center justify-center text-[24px] font-extrabold text-white tracking-[-1px]"
@@ -104,8 +115,13 @@ export default function ProfilePage() {
               <div className="text-[12px] font-medium text-g600 mt-0.5">
                 작성 리뷰 {user.reviewCount ?? 0}개
               </div>
+              {!canChangeNickname && (
+                <div className="text-[11px] font-medium text-g400 mt-0.5">
+                  {remainingDays}일 후 변경 가능
+                </div>
+              )}
             </div>
-            <Icon name="chevR" size={14} color="#B0B8C1" weight={1.8} />
+            {canChangeNickname && <Icon name="chevR" size={14} color="#B0B8C1" weight={1.8} />}
           </button>
 
           {/* 진행도 */}

@@ -186,8 +186,14 @@ export default function NicknameSetupModal({ onClose, mode = 'setup', initialNic
       if (status === 409 && msg?.includes('이미 사용 중')) {
         setAvailability({ status: 'taken', message: '이미 사용 중인 닉네임입니다', normalizedNickname: confirmed })
         setSubmitError('이미 사용 중인 닉네임입니다')
-      } else if (status === 409 && msg?.includes('30일')) {
-        setSubmitError('닉네임은 30일에 한 번만 변경할 수 있어요')
+      } else if (status === 409) {
+        const nextChangeAt = err.response?.data?.nextChangeAt
+        if (nextChangeAt) {
+          const days = Math.ceil((new Date(nextChangeAt) - Date.now()) / (1000 * 60 * 60 * 24))
+          setSubmitError(`${Math.max(days, 1)}일 후에 변경할 수 있어요`)
+        } else {
+          setSubmitError('닉네임은 30일에 한 번만 변경할 수 있어요')
+        }
       } else {
         setSubmitError(msg ?? '닉네임 저장에 실패했습니다')
       }
