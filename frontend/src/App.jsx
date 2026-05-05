@@ -18,7 +18,13 @@ import useToast from './hooks/useToast.jsx'
 
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, staleTime: 1000 * 60 } },
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 1000 * 60,
+      gcTime: 1000 * 60 * 5,
+    },
+  },
 })
 
 function getActiveTab(pathname) {

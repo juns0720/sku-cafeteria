@@ -82,7 +82,7 @@
 
 ### E-3 프론트엔드 성능
 - [x] **PERF-T1**: GitHub Actions keep-alive — 이미 cron job으로 완료
-- [ ] **FE-T1**: `client.js` timeout 30s + React Query `retry:2` / `gcTime` 명시 설정
+- [x] **FE-T1**: `client.js` timeout 30s + React Query `retry:2` / `gcTime` 명시 설정
 - [ ] **FE-T2**: Vite `manualChunks` vendor 분리 + `React.lazy` 라우트 분할
 - [ ] **FE-T3**: `index.html` preconnect 힌트 추가 (Pretendard CDN)
 
